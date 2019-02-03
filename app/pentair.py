@@ -140,7 +140,7 @@ PUMP_PROGRAM = {
 
 PUMP_POWER = {
         True:   0x04,
-        False:  0x10
+        False:  0x0A
         }
 
 EXTERNAL_PROGRAM = {
@@ -316,7 +316,6 @@ class Pump():
         self.__program_3        = None
         self.__program_4        = None
         self.__remote_control   = None
-        self.__rpm              = None
         self.__speed            = None
 
     def send(self, command, data=None):
@@ -326,12 +325,10 @@ class Pump():
             print(("Pump.send(command=", hex(command), ")"))
 
         self.remote_control = True
-        response = Packet(
-                dst     = self.address,
-#                dst     = ADDRESSES['BROADCAST'],
-                action  = command,
-                data    = data,
-                ).send()
+        response = Packet(dst=self.address, action=command, data=data).send()
+        # Should add some error checking and retry logic here -- confirm that
+        # the response packet is for the same action we sent or handle the
+        # error if not.
         self.remote_control = False
 
         return response
@@ -339,29 +336,26 @@ class Pump():
     @property
     def datetime(self):
         return self.send(0x03)
-    #HERE
+    # Need to actually implement this one
     # Error 19: ?
-    # Error 8: Missing parameters
-    # Error 7: Extra parameters
+    # Error 8: Missing parameters?
+    # Error 7: Extra parameters?
 
     @datetime.setter
     def datetime(self, data):
         return self.send(ACTIONS['SET_DATETIME'], [data['hour'], data['minute'], WEEKDAYS[data['dow']], data['dom'], data['month'], data['year'], data['dst'], data['auto_dst']])
 
     @property
-    def time(self):
-        packet = self.send(ACTIONS['GET_TIME'])
-        return list(packet.data)
+    def mode(self):
+        return self.status['mode']
 
     @property
     def power(self):
-        return self.__power
+        return self.status['run'] == 0x0A
 
     @power.setter
     def power(self, state):
-        self.send(ACTIONS['PUMP_POWER'], [PUMP_POWER[state]])
-        self.__power = state
-        return self.__power
+        return self.send(ACTIONS['PUMP_POWER'], [PUMP_POWER[state]])
 
     @property
     def program(self):
@@ -399,8 +393,7 @@ class Pump():
 
     @property
     def rpm(self):
-        self.status()
-        return self.__rpm
+        return self.status['rpm']
 
     @rpm.setter
     def rpm(self, rpm):
@@ -422,18 +415,37 @@ class Pump():
         self.__speed = speed
         return self.__speed
 
+    @property
     def status(self):
         response = self.send(ACTIONS['PUMP_STATUS'])
+        # We should be able to get rid of this sanity check once we implement
+        # sanity checking in self.send()
         if response.action == ACTIONS['PUMP_STATUS']:
             data = response.data
-            self._mode = data[PUMP_STATUS_FIELDS['MODE']]
-            self._watts = 0x100 * data[PUMP_STATUS_FIELDS['WATTS_H']] + data[PUMP_STATUS_FIELDS['WATTS_L']]
-            self.__rpm = 0x100 * data[PUMP_STATUS_FIELDS['RPM_H']] + data[PUMP_STATUS_FIELDS['RPM_L']]
-            self._hour_r, self._minute_r = data[PUMP_STATUS_FIELDS['REMAINING_TIME_H']], data[PUMP_STATUS_FIELDS['REMAINING_TIME_M']]
-            self._hour_c, self._minute_c = data[PUMP_STATUS_FIELDS['CLOCK_TIME_H']], data[PUMP_STATUS_FIELDS['CLOCK_TIME_M']]
-            return self._mode, self._watts, self.__rpm, self._hour_r, self._minute_r, self._hour_c, self._minute_c
+            return {
+                'run':      data[PUMP_STATUS_FIELDS['RUN']],
+                'mode':     data[PUMP_STATUS_FIELDS['MODE']],
+                'watts':    data[PUMP_STATUS_FIELDS['WATTS_L']] + 256 * data[PUMP_STATUS_FIELDS['WATTS_H']],
+                'rpm':      data[PUMP_STATUS_FIELDS['RPM_L']] + 256 * data[PUMP_STATUS_FIELDS['RPM_H']],
+                'timer':    [data[PUMP_STATUS_FIELDS['REMAINING_TIME_H']], data[PUMP_STATUS_FIELDS['REMAINING_TIME_M']]],
+                'time':     [data[PUMP_STATUS_FIELDS['CLOCK_TIME_H']], data[PUMP_STATUS_FIELDS['CLOCK_TIME_M']]]
+                }
         else:
             return False
+
+    @property
+    def time(self):
+        return list(self.send(ACTIONS['GET_TIME']).data)
+        # Could also get from self.status, but that puts more bytes on the bus
+        # return self.status['time']
+
+    @property
+    def timer(self):
+        return self.status['timer']
+
+    @property
+    def watts(self):
+        return self.status['watts']
 
 def broadcastDateTime(): #TODO Actually implement this
     broadcast(BROADCAST_ACTIONS['DATE_TIME'], [15,34, 1, 10, 7, 16, 0, 1])

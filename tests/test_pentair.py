@@ -1,5 +1,6 @@
 import unittest
-from app.pentair import Packet
+import time
+from app.pentair import Packet, Pump
 
 PAYLOAD_HEADER  = 0xA5
 SRC             = 0x21
@@ -12,8 +13,20 @@ SET             = 0x02
 RPM             = 0xC4
 VERSION         = 0x00
 
+class TestPumpMethods(unittest.TestCase):
+
+    def test_get_power(self):
+        self.assertIn(Pump(1).power, [True, False])
+
+    def test_get_rpm(self):
+        self.assertGreaterEqual(Pump(1).rpm, 0)
+
+    def test_get_watts(self):
+        self.assertGreaterEqual(Pump(1).watts, 0)
+
 class TestPacketMethods(unittest.TestCase):
 
+### Data Length, because incoming data can have several formats
 
     def test_data_length_with_no_data(self):
         packet = Packet(dst=DST, action=GET_PUMP_STATUS)
@@ -31,6 +44,7 @@ class TestPacketMethods(unittest.TestCase):
         packet = Packet(dst=DST, action=PUMP_PROGRAM, data=[SET, RPM, 5, 220])
         self.assertEqual(packet.data_length, 4)
 
+### Payload, as above, mostly checking various input format handling
 
     def test_payload_with_no_data(self):
         packet = Packet(dst=DST, action=GET_PUMP_STATUS)
@@ -48,6 +62,7 @@ class TestPacketMethods(unittest.TestCase):
         packet = Packet(dst=DST, action=PUMP_PROGRAM, data=[SET, RPM, 5, 220])
         self.assertEqual(packet.payload, [PAYLOAD_HEADER, VERSION, DST, SRC, PUMP_PROGRAM, 4, SET, RPM, 5, 220])
 
+### Checksums and Such
 
     def test_checkbytes(self):
         packet = Packet(dst=DST, action=PUMP_PROGRAM, data=[SET, RPM, 5, 220])
