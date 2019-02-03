@@ -18,6 +18,14 @@ class TestPumpMethods(unittest.TestCase):
     def test_get_power(self):
         self.assertIn(Pump(1).power, [True, False])
 
+    def test_power_on(self):
+        Pump(1).power = True
+        self.assertEqual(Pump(1).power, True)
+
+    def test_power_off(self):
+        Pump(1).power = False
+        self.assertEqual(Pump(1).power, False)
+
     def test_get_rpm(self):
         self.assertGreaterEqual(Pump(1).rpm, 0)
 

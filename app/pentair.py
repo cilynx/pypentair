@@ -117,7 +117,7 @@ PUMP_STATUS_FIELDS = {
         }
 
 PUMP_SPEED = {
-        'FILTER':  0x00,
+        'FILTER':       0x00,
         'MANUAL':       0x01,
         'SPEED_1':      0x02,
         'SPEED_2':      0x03,
@@ -139,8 +139,8 @@ PUMP_PROGRAM = {
         }
 
 PUMP_POWER = {
-        True:   0x04,
-        False:  0x0A
+        False:  0x04,
+        True:   0x0A,
         }
 
 EXTERNAL_PROGRAM = {
@@ -309,7 +309,6 @@ class Packet():
 class Pump():
     def __init__(self, index):
         self.address            = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
-        self.__power            = None
         self.__program          = None
         self.__program_1        = None
         self.__program_2        = None
