@@ -201,8 +201,12 @@ class Packet():
         else:
             self.dst        = dst
             self.action     = action
-            self.data       = data
             self.src        = src
+            if isinstance(data, int):
+                self.data   = [data]
+            else:
+                self.data   = data
+
 #        print("__init__() self.data", self.data)
         if DEBUG: self.inspect
 
@@ -247,28 +251,13 @@ class Packet():
 
     @property
     def bytes(self):
-        payload = [self.payload_header, self.version, self.dst, self.src, self.action]
-
-        if self.data != None:
-            if isinstance(self.data, int):
-                payload.extend([1, self.data])
-            else:
-                payload.append(len(self.data))
-                payload.extend(self.data)
-        else:
-            payload.append(0)
-
-        checkh = int(sum(payload) / 0x100)
-        checkl = int(sum(payload) % 0x100)
-        payload.extend([checkh, checkl])
-
-        return self.header + payload
+        return Packet.header + self.payload + self.checkbytes
 
     @bytes.setter
     def bytes(self, array):
         packet = array[0]
-        if packet[0:4] != self.header + [self.payload_header]:
-            packet = self.header + [self.payload_header] + packet
+        if packet[0:5] != Packet.header + [Packet.payload_header] + [Packet.version]:
+            packet = Packet.header + [Packet.payload_header] + [Packet.version] + packet
 
         payload_start   = PACKET_FIELDS['PAYLOAD_HEADER']
         data_length     = packet[PACKET_FIELDS['DATA_LENGTH']]
@@ -281,12 +270,18 @@ class Packet():
             read_checksum = 256 * packet[-2] + packet[-1]
             if read_checksum != sum(payload):
                 print("Bad Checksum", read_checksum, sum(payload))
+                raise ValueError("Provided checksum does not match calculated checksum")
                 return False
 
-        self.dst    = packet[PACKET_FIELDS['DST']]
-        self.src    = packet[PACKET_FIELDS['SRC']]
-        self.action = packet[PACKET_FIELDS['ACTION']]
-        self.data   = packet[PACKET_FIELDS['DATA']:data_end]
+        self.dst        = packet[PACKET_FIELDS['DST']]
+        self.src        = packet[PACKET_FIELDS['SRC']]
+        self.action     = packet[PACKET_FIELDS['ACTION']]
+
+        if data_end > PACKET_FIELDS['DATA']:
+            self.data   = packet[PACKET_FIELDS['DATA']:data_end]
+        else:
+            self.data   = None
+
         return self.bytes
 
     @property
@@ -294,24 +289,22 @@ class Packet():
         return sum(self.payload)
 
     @property
+    def checkbytes(self):
+        return [int(sum(self.payload) / 0x100), int(sum(self.payload) % 0x100)]
+
+    @property
     def data_length(self):
         if self.data:
-            if isinstance(self.data, int):
-                return 1
-            else:
-                return len(self.data)
+            return len(self.data)
         else:
             return 0
 
     @property
     def payload(self):
-        payload = [self.payload_header, self.dst, self.src, self.action, self.data_length]
-        if self.data_length > 0:
-            if isinstance(self.data, int):
-                payload.extend([self.data])
-            else:
-                payload.extend(self.data)
-        return payload
+        if self.data_length:
+            return [Packet.payload_header, Packet.version, self.dst, self.src, self.action, self.data_length] + self.data
+        else:
+            return [Packet.payload_header, Packet.version, self.dst, self.src, self.action, self.data_length]
 
 class Pump():
     def __init__(self, index):
