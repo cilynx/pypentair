@@ -46,3 +46,8 @@ class TestPacketMethods(unittest.TestCase):
     def test_payload_with_multiple_data_bytes(self):
         packet = Packet(dst=DST, action=PUMP_PROGRAM, data=[SET, RPM, 5, 220])
         self.assertEqual(packet.payload, [PAYLOAD_HEADER, DST, SRC, PUMP_PROGRAM, 4, SET, RPM, 5, 220])
+
+
+    def test_checksum(self):
+        packet = Packet(dst=DST, action=PUMP_PROGRAM, data=[SET, RPM, 5, 220])
+        self.assertEqual(packet.checksum, 2*256 + 210)
