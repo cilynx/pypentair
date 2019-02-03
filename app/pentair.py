@@ -15,7 +15,7 @@ PACKET_FIELDS = {
         'DATA':             9,
         }
 
-ADDRESSES = { 
+ADDRESSES = {
         'BROADCAST':                    0x0F,
         'SUNTOUCH':                     0x10,
         'EASYTOUCH':                    0x20,
@@ -99,7 +99,7 @@ ACTIONS = {
         }
 
 PUMP_STATUS_FIELDS = {
-        'RUN':                  0, 
+        'RUN':                  0,
         'MODE':                 1,
         'DRIVE_STATE':          2,
         'WATTS_H':              3,
@@ -109,7 +109,7 @@ PUMP_STATUS_FIELDS = {
         'GPM':                  7,
         'PPC':                  8,
         'UNKNOWN':              9,
-        'ERROR':                10, 
+        'ERROR':                10,
         'REMAINING_TIME_H':     11,
         'REMAINING_TIME_M':     12,
         'CLOCK_TIME_H':         13,
@@ -248,7 +248,7 @@ class Packet():
     @property
     def bytes(self):
         payload = [self.payload_header, self.version, self.dst, self.src, self.action]
-        
+
         if self.data != None:
             if isinstance(self.data, int):
                 payload.extend([1, self.data])
@@ -272,7 +272,7 @@ class Packet():
 
         payload_start   = PACKET_FIELDS['PAYLOAD_HEADER']
         data_length     = packet[PACKET_FIELDS['DATA_LENGTH']]
-        data_end        = payload_start + data_length + PACKET_FIELDS['DATA'] - PACKET_FIELDS['PAYLOAD_HEADER'] 
+        data_end        = payload_start + data_length + PACKET_FIELDS['DATA'] - PACKET_FIELDS['PAYLOAD_HEADER']
         packet_length   = len(packet)
 
         payload = packet[payload_start:data_end]
@@ -295,15 +295,23 @@ class Packet():
 
     @property
     def data_length(self):
-#        print("data_length(): self.data", self.data)
         if self.data:
-            return len(self.data)
+            if isinstance(self.data, int):
+                return 1
+            else:
+                return len(self.data)
         else:
             return 0
 
     @property
     def payload(self):
-        return [self.payload_header, self.dst, self.src, self.action, self.data_length] + self.data
+        payload = [self.payload_header, self.dst, self.src, self.action, self.data_length]
+        if self.data_length > 0:
+            if isinstance(self.data, int):
+                payload.extend([self.data])
+            else:
+                payload.extend(self.data)
+        return payload
 
 class Pump():
     def __init__(self, index):
@@ -389,8 +397,8 @@ class Pump():
     @remote_control.setter
     def remote_control(self, state):
         response = Packet(
-                dst     = self.address, 
-                action  = ACTIONS['REMOTE_CONTROL'], 
+                dst     = self.address,
+                action  = ACTIONS['REMOTE_CONTROL'],
                 data    = [REMOTE_CONTROL_MODES[state]]
                 ).send()
         self.__remote_control = state
@@ -406,7 +414,7 @@ class Pump():
         response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['RPM'] + [int(rpm / 0x100), int(rpm % 0x100)])
         if int(rpm / 0x100) == response[PACKET_FIELDS['DATA']] and int(rpm % 0x100) == response[PACKET_FIELDS['DATA']+1]:
             print("Success")
-            return rpm 
+            return rpm
         else:
             print("Failure", binascii.hexlify(response))
             return False
@@ -457,7 +465,7 @@ def getResponse():
             if pbytes == Packet.header + [Packet.payload_header]:
                 pbytes.extend(list(RS485.read(4)))              # Version, DST, SRC, Action
                 data_length = ord(RS485.read())                 # Data Length
-                pbytes.append(data_length)                      # 
+                pbytes.append(data_length)                      #
                 pbytes.extend(list(RS485.read(data_length)))    # Data
                 pbytes.extend(list(RS485.read(2)))              # Checksum
                 return Packet(pbytes)
