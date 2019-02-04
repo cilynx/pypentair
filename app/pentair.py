@@ -118,11 +118,15 @@ PUMP_STATUS_FIELDS = {
 PUMP_SPEED = {
         'FILTER':       0x00,
         'MANUAL':       0x01,
-        'SPEED_1':      0x02,
+        'SPEED_1':      0x02, # Backwash on some pumps?
         'SPEED_2':      0x03,
         'SPEED_3':      0x04,
         'SPEED_4':      0x05,
         'FEATURE_1':    0x06,
+        'EXTERNAL_1':   0x09, # Need to test these
+        'EXTERNAL_2':   0x0a,
+        'EXTERNAL_3':   0x0b,
+        'EXTERNAL_4':   0x0c,
         }
 
 PUMP_PROGRAM = {
@@ -133,8 +137,8 @@ PUMP_PROGRAM = {
         'SET_PROGRAM_1':    [0x03, 0x27],
         'SET_PROGRAM_2':    [0x03, 0x28],
         'SET_PROGRAM_3':    [0x03, 0x29],
-        'SET_PROGRAM_4':    [0x03, 0x30],
-        'SET_TIMER':        [0x03, 0x31],
+        'SET_PROGRAM_4':    [0x03, 0x2a],
+        'SET_TIMER':        [0x03, 0x2b],
         }
 
 PUMP_POWER = {
@@ -245,7 +249,18 @@ class Packet():
 
     def send(self):
         RS485.write(bytearray(self.bytes))
-        return getResponse()
+#        print()
+#        print("Request: ", self.bytes)
+        response = getResponse()
+#        print("Response:", response.bytes)
+        if response.action == self.action:
+            return response
+        elif response.action == ACTIONS['ERROR']:
+#            raise ValueError("Received an ERROR {} from the pump".format(response.bytes[9]), response.bytes)
+#            print("Received an ERROR {} from the pump".format(response.bytes[9]))
+            return response
+        else:
+            raise ValueError("This packet goes somewhere else -- maybe we need a buffer")
 
     @property
     def bytes(self):
@@ -287,7 +302,7 @@ class Packet():
 
     @property
     def checkbytes(self):
-        return bytelist(sum(self.payload))
+        return bytelist(self.checksum)
 
     @property
     def data_length(self):
@@ -317,7 +332,11 @@ class Pump():
     def send(self, action, data=None):
 
         self.remote_control = True
-        response = Packet(dst=self.address, action=action, data=data).send()
+        request = Packet(dst=self.address, action=action, data=data)
+#        print()
+#        print("Send:", request.bytes)
+        response = request.send()
+#        print("Receive:", response.bytes)
         # Should add some error checking and retry logic here -- confirm that
         # the response packet is for the same action we sent or handle the
         # error if not.
@@ -374,7 +393,7 @@ class Pump():
         return self.__program_1
 
     @program_1.setter
-    def program_1(self, rpm): # TODO -- this isn't working. Need to investigate.
+    def program_1(self, rpm):
         response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_1'] + bytelist(rpm))
         self.__program_1 = rpm
         return self.__program_1
@@ -425,6 +444,7 @@ class Pump():
         # We should be able to get rid of this sanity check once we implement
         # sanity checking in self.send()
         if response.action == ACTIONS['PUMP_STATUS']:
+            response.inspect()
             data = response.data
             return {
                 'run':      data[PUMP_STATUS_FIELDS['RUN']],
