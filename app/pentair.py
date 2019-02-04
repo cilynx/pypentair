@@ -314,10 +314,10 @@ class Pump():
         self.__remote_control   = None
         self.__speed            = None
 
-    def send(self, command, data=None):
+    def send(self, action, data=None):
 
         self.remote_control = True
-        response = Packet(dst=self.address, action=command, data=data).send()
+        response = Packet(dst=self.address, action=action, data=data).send()
         # Should add some error checking and retry logic here -- confirm that
         # the response packet is for the same action we sent or handle the
         # error if not.
@@ -459,9 +459,9 @@ def setPumpTimer():
     data.extend([0x00, 0x05])
     sendPump(ACTIONS['PUMP_PROGRAM'], data)
 
-def broadcast(command, data=None):
+def broadcast(action, data=None):
     dst = ADDRESSES['BROADCAST']
-    RS485.write(buildPacket(dst, command, data))
+    RS485.write(buildPacket(dst, action, data))
 
 def getResponse():
     pbytes = []
