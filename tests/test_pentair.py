@@ -1,5 +1,4 @@
 import unittest
-import time
 from app.pentair import Packet, Pump
 
 PAYLOAD_HEADER  = 0xA5
@@ -15,9 +14,6 @@ VERSION         = 0x00
 
 class TestPumpMethods(unittest.TestCase):
 
-    def test_get_power(self):
-        self.assertIn(Pump(1).power, [True, False])
-
     def test_power_on(self):
         Pump(1).power = True
         self.assertEqual(Pump(1).power, True)
@@ -26,11 +22,14 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).power = False
         self.assertEqual(Pump(1).power, False)
 
-    def test_get_rpm(self):
-        self.assertGreaterEqual(Pump(1).rpm, 0)
-
-    def test_get_watts(self):
-        self.assertGreaterEqual(Pump(1).watts, 0)
+    def test_set_rpm(self):
+        for rpm in [3000, 2500, 2000, 1100]:
+            with self.subTest(rpm=rpm):
+                Pump(1).rpm = rpm
+                self.assertEqual(Pump(1).rpm, rpm)
+                # Ugly formula below is best-fit polynomial to manually collected data.
+                # Across the usable rpm range, deviation stays <100 watts
+                self.assertAlmostEqual(Pump(1).watts, 0.0004*(rpm**2)-0.8*rpm+611, delta=100)
 
 class TestPacketMethods(unittest.TestCase):
 

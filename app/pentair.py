@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 DEBUG = True
 
 PACKET_FIELDS = {
@@ -168,6 +167,9 @@ WEEKDAYS = {
 
 # SCHEDULE_DAYS are WEEKDAYS + 128 as the most significant bit of the mask is always high
 
+def bytelist(x):
+    return list(x.to_bytes(2, byteorder='big'))
+
 def lookup(dict, val): # Dictionary inversion
     try:
         return list(dict.keys())[list(dict.values()).index(val)]
@@ -188,6 +190,7 @@ RS485 = serial.Serial(
         )
 
 import binascii
+import time
 
 class Packet():
     header             = [0xFF, 0x00, 0xFF]
@@ -195,7 +198,6 @@ class Packet():
     version            = 0x00
 
     def __init__(self, *args, src=ADDRESSES['REMOTE_CONTROLLER'], dst=None, action=None, data=None):
-        print("Packet.__init__()")
         if args is not ():
             self.bytes      = args
         else:
@@ -207,10 +209,7 @@ class Packet():
             else:
                 self.data   = data
 
-#        print("__init__() self.data", self.data)
-        if DEBUG: self.inspect
 
-    @property
     def inspect(self):
         print("   Destination:\t\t", pp(self.dst), lookup(ADDRESSES, self.dst))
         print("   Source:\t\t", pp(self.src), lookup(ADDRESSES, self.src))
@@ -245,7 +244,6 @@ class Packet():
             print("      CLOCK_TIME_M:\t", data[PUMP_STATUS_FIELDS['CLOCK_TIME_M']])
 
     def send(self):
-        print("Packet.send(", self.bytes, ")")
         RS485.write(bytearray(self.bytes))
         return getResponse()
 
@@ -269,7 +267,6 @@ class Packet():
         if packet_length > data_length + PACKET_FIELDS['DATA']:
             read_checksum = 256 * packet[-2] + packet[-1]
             if read_checksum != sum(payload):
-                print("Bad Checksum", read_checksum, sum(payload))
                 raise ValueError("Provided checksum does not match calculated checksum")
                 return False
 
@@ -318,10 +315,6 @@ class Pump():
         self.__speed            = None
 
     def send(self, command, data=None):
-        if data != None:
-            print(("Pump.send(command=", hex(command), ", data=", data, ")"))
-        else:
-            print(("Pump.send(command=", hex(command), ")"))
 
         self.remote_control = True
         response = Packet(dst=self.address, action=command, data=data).send()
@@ -354,7 +347,17 @@ class Pump():
 
     @power.setter
     def power(self, state):
-        return self.send(ACTIONS['PUMP_POWER'], [PUMP_POWER[state]])
+        if DEBUG: print("Attempting to set power:", state)
+        for x in range(0,120):
+            response = self.send(ACTIONS['PUMP_POWER'], [PUMP_POWER[state]])
+            if DEBUG: print("Desired power state:", state, "Actual power state:", self.power)
+            if self.power == state:
+                if DEBUG: print("Successfully set power:", state)
+                return
+            time.sleep(1)
+        response.inspect()
+
+        raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
 
     @property
     def program(self):
@@ -388,7 +391,6 @@ class Pump():
                 data    = [REMOTE_CONTROL_MODES[state]]
                 ).send()
         self.__remote_control = state
-        return self.__remote_control
 
     @property
     def rpm(self):
@@ -396,13 +398,16 @@ class Pump():
 
     @rpm.setter
     def rpm(self, rpm):
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['RPM'] + [int(rpm / 0x100), int(rpm % 0x100)])
-        if int(rpm / 0x100) == response[PACKET_FIELDS['DATA']] and int(rpm % 0x100) == response[PACKET_FIELDS['DATA']+1]:
-            print("Success")
-            return rpm
-        else:
-            print("Failure", binascii.hexlify(response))
-            return False
+        if DEBUG: print("Requesting RPM change to", rpm)
+        for x in range(0,120):
+            response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['RPM'] + bytelist(rpm))
+            if self.rpm == rpm:
+                if DEBUG: print("Successfully set RPM to ", rpm)
+                return
+            if DEBUG: print("Desired RPM:", rpm, "Actual RPM:", self.rpm)
+            time.sleep(1)
+        response.inspect()
+        raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
 
     @property
     def speed(self):
@@ -459,7 +464,6 @@ def broadcast(command, data=None):
     RS485.write(buildPacket(dst, command, data))
 
 def getResponse():
-    print("getResponse()")
     pbytes = []
     while True:
         for c in RS485.read():
