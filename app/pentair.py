@@ -287,7 +287,7 @@ class Packet():
 
     @property
     def checkbytes(self):
-        return [int(sum(self.payload) / 0x100), int(sum(self.payload) % 0x100)]
+        return bytelist(sum(self.payload))
 
     @property
     def data_length(self):
@@ -375,7 +375,7 @@ class Pump():
 
     @program_1.setter
     def program_1(self, rpm): # TODO -- this isn't working. Need to investigate.
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_1'] + [int(rpm / 0x100), int(rpm % 0x100)])
+        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_1'] + bytelist(rpm))
         self.__program_1 = rpm
         return self.__program_1
 
