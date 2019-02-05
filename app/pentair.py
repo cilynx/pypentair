@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-DEBUG = True
+DEBUG               = True
+INSPECT_STATUS      = False
+RAISE_PACKET_ERRORS = False
 
 PACKET_FIELDS = {
     'PACKET_HEADER_0':  0,
@@ -251,8 +253,8 @@ class Packet():
         if response.action == self.action:
             return response
         elif response.action == ACTIONS['ERROR']:
-#            raise ValueError("Received an ERROR {} from the pump".format(response.bytes[9]), response.bytes)
-#            print("Received an ERROR {} from the pump".format(response.bytes[9]))
+            if RAISE_PACKET_ERRORS:
+                raise ValueError("Received an ERROR {} from the pump".format(response.bytes[9]), response.bytes)
             return response
         else:
             raise ValueError("This packet goes somewhere else -- maybe we need a buffer")
@@ -465,7 +467,8 @@ class Pump():
         # We should be able to get rid of this sanity check once we implement
         # sanity checking in self.send()
         if response.action == ACTIONS['PUMP_STATUS']:
-#            response.inspect()
+            if INSPECT_STATUS:
+                response.inspect()
             data = response.data
             return {
                 'run':      data[PUMP_STATUS_FIELDS['RUN']],
