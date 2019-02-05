@@ -116,18 +116,13 @@ PUMP_STATUS_FIELDS = {
         }
 
 PUMP_SPEED = {
-        'FILTER':       0x00,
-        'MANUAL':       0x01,
-        'SPEED_1':      0x02, # Backwash on some pumps?
+        'SPEED_1':      0x02,
         'SPEED_2':      0x03,
         'SPEED_3':      0x04,
         'SPEED_4':      0x05,
-        'FEATURE_1':    0x06,
-        'EXTERNAL_1':   0x09, # Need to test these
-        'EXTERNAL_2':   0x0a,
-        'EXTERNAL_3':   0x0b,
-        'EXTERNAL_4':   0x0c,
-        }
+        'QUICK_CLEAN':  0x0a,
+        'TIME_OUT':     0x0b,
+}
 
 PUMP_PROGRAM = {
         'OFF':              0x00,
