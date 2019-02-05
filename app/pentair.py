@@ -249,10 +249,10 @@ class Packet():
 
     def send(self):
         RS485.write(bytearray(self.bytes))
-#        print()
-#        print("Request: ", self.bytes)
+        if DEBUG: print()
+        if DEBUG: print("Request: ", self.bytes)
         response = getResponse()
-#        print("Response:", response.bytes)
+        if DEBUG: print("Response:", response.bytes)
         if response.action == self.action:
             return response
         elif response.action == ACTIONS['ERROR']:
@@ -332,11 +332,7 @@ class Pump():
     def send(self, action, data=None):
 
         self.remote_control = True
-        request = Packet(dst=self.address, action=action, data=data)
-#        print()
-#        print("Send:", request.bytes)
-        response = request.send()
-#        print("Receive:", response.bytes)
+        response = Packet(dst=self.address, action=action, data=data).send()
         # Should add some error checking and retry logic here -- confirm that
         # the response packet is for the same action we sent or handle the
         # error if not.
@@ -444,7 +440,7 @@ class Pump():
         # We should be able to get rid of this sanity check once we implement
         # sanity checking in self.send()
         if response.action == ACTIONS['PUMP_STATUS']:
-            response.inspect()
+#            response.inspect()
             data = response.data
             return {
                 'run':      data[PUMP_STATUS_FIELDS['RUN']],
