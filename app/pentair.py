@@ -75,14 +75,14 @@ BROADCAST_ACTIONS = {
 
 # For STATUS (0x02) through HEAT_SETTINGS (0x28):
 # - Add 0x80 for Setter
-SET = 0x80
+#SET = 0x80
 # - Add 0xC0 for Getter
-GET = 0xC0
+#GET = 0xC0
 
 ACTIONS = {
     'ACK_MESSAGE':      0x00,
-    'PUMP_PROGRAM':     0x01,
-    '__0x02__':         0x02,
+    'SET':              0x01,
+    'GET':              0x02,
     'GET_TIME':         0x03,
     'REMOTE_CONTROL':   0x04,
     'PUMP_SPEED':       0x05,
@@ -126,29 +126,37 @@ PUMP_SPEED = {
     'TIME_OUT':     0x0b,
 }
 
-PUMP_PROGRAM = {
+PROGRAM = [         # Addresses for getting and setting Program RPMs
+    None,
+    [0x03, 0x27],   # Program 1
+    [0x03, 0x28],   # Program 2
+    [0x03, 0x29],   # Program 3
+    [0x03, 0x2a],   # Program 4
+    [0x03, 0xbb],   # Seems to be an alias of 0x27
+    [0x03, 0xbc],   # Seems to be an alias of 0x28
+    [0x03, 0xbd],   # Seems to be an alias of 0x29
+    [0x03, 0xbe],   # Seems to be an alias of 0x30
+]
+
+RUN_PROGRAM = {                 # Addresses for running Programs
+    'STOP': [0x00],
+    '1':    [0x00, 0x08],   # Program 1
+    '2':    [0x00, 0x10],   # Program 2
+    '3':    [0x00, 0x18],   # Program 3
+    '4':    [0x00, 0x20],   # Program 4
+}
+
+MODE = {
     'OFF':              0x00,
     'RPM':              [0x02, 0xC4],
     'GPM':              [0x02, 0xE4],
-    'EXTERNAL':         [0x03, 0x21],
-    'SET_PROGRAM_1':    [0x03, 0x27],
-    'SET_PROGRAM_2':    [0x03, 0x28],
-    'SET_PROGRAM_3':    [0x03, 0x29],
-    'SET_PROGRAM_4':    [0x03, 0x2a],
+    'RUN_PROGRAM':      [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
 }
 
 PUMP_POWER = {
     False:  0x04,
     True:   0x0A,
-}
-
-EXTERNAL_PROGRAM = {
-    'STOP':     0x00,
-    1:          [0x00, 0x08],
-    2:          [0x00, 0x10],
-    3:          [0x00, 0x18],
-    4:          [0x00, 0x20],
 }
 
 REMOTE_CONTROL_MODES = {
@@ -377,7 +385,7 @@ class Pump():
 
     @program.setter
     def program(self, index):
-        self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['EXTERNAL'] + EXTERNAL_PROGRAM[index])
+        self.send(ACTIONS['SET'], MODE['RUN_PROGRAM'] + RUN_PROGRAM[index])
         self.__program = index
         return self.__program
 
@@ -387,7 +395,7 @@ class Pump():
 
     @program_1.setter
     def program_1(self, rpm):
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_1'] + bytelist(rpm))
+        response = self.send(ACTIONS['SET'], PROGRAM[1] + bytelist(rpm))
         self.__program_1 = rpm
         return self.__program_1
 
@@ -397,7 +405,7 @@ class Pump():
 
     @program_2.setter
     def program_2(self, rpm):
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_2'] + bytelist(rpm))
+        response = self.send(ACTIONS['SET'], PROGRAM[2] + bytelist(rpm))
         self.__program_2 = rpm
         return self.__program_2
 
@@ -407,7 +415,7 @@ class Pump():
 
     @program_3.setter
     def program_3(self, rpm):
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_3'] + bytelist(rpm))
+        response = self.send(ACTIONS['SET'], PROGRAM[3] + bytelist(rpm))
         self.__program_3 = rpm
         return self.__program_3
 
@@ -417,7 +425,7 @@ class Pump():
 
     @program_4.setter
     def program_4(self, rpm):
-        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_4'] + bytelist(rpm))
+        response = self.send(ACTIONS['SET'], PROGRAM[4] + bytelist(rpm))
         self.__program_4 = rpm
         return self.__program_4
 
@@ -442,7 +450,7 @@ class Pump():
     def rpm(self, rpm):
         if DEBUG: print("Requesting RPM change to", rpm)
         for x in range(0,120):
-            response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['RPM'] + bytelist(rpm))
+            response = self.send(ACTIONS['SET'], MODE['RPM'] + bytelist(rpm))
             if self.rpm == rpm:
                 if DEBUG: print("Successfully set RPM to ", rpm)
                 return
@@ -499,9 +507,9 @@ def broadcastDateTime(): #TODO Actually implement this
     broadcast(BROADCAST_ACTIONS['DATE_TIME'], [15,34, 1, 10, 7, 16, 0, 1])
 
 def setPumpTimer():
-    data = PUMP_PROGRAM['SET_TIMER']
+    data = MODE['SET_TIMER']
     data.extend([0x00, 0x05])
-    sendPump(ACTIONS['PUMP_PROGRAM'], data)
+    sendPump(ACTIONS['SET'], data)
 
 def broadcast(action, data=None):
     dst = ADDRESSES['BROADCAST']
