@@ -2,74 +2,74 @@
 DEBUG = True
 
 PACKET_FIELDS = {
-        'PACKET_HEADER_0':  0,
-        'PACKET_HEADER_1':  1,
-        'PACKET_HEADER_2':  2,
-        'PAYLOAD_HEADER':   3,
-        'VERSION':          4,
-        'DST':              5,
-        'SRC':              6,
-        'ACTION':           7,
-        'DATA_LENGTH':      8,
-        'DATA':             9,
-        }
+    'PACKET_HEADER_0':  0,
+    'PACKET_HEADER_1':  1,
+    'PACKET_HEADER_2':  2,
+    'PAYLOAD_HEADER':   3,
+    'VERSION':          4,
+    'DST':              5,
+    'SRC':              6,
+    'ACTION':           7,
+    'DATA_LENGTH':      8,
+    'DATA':             9,
+}
 
 ADDRESSES = {
-        'BROADCAST':                    0x0F,
-        'SUNTOUCH':                     0x10,
-        'EASYTOUCH':                    0x20,
-        'REMOTE_CONTROLLER':            0x21,
-        'REMOTE_WIRELESS_CONTROLLER':   0x22,
-        'QUICKTOUCH':                   0x48,
-        'INTELLIFLO_PUMP_1':            0x60,
-        'INTELLIFLO_PUMP_2':            0x61,
-        'INTELLIFLO_PUMP_3':            0x62,
-        'INTELLIFLO_PUMP_4':            0x63,
-        'INTELLIFLO_PUMP_5':            0x64,
-        'INTELLIFLO_PUMP_6':            0x65,
-        'INTELLIFLO_PUMP_7':            0x66,
-        'INTELLIFLO_PUMP_8':            0x67,
-        'INTELLIFLO_PUMP_9':            0x68,
-        'INTELLIFLO_PUMP_10':           0x69,
-        'INTELLIFLO_PUMP_11':           0x6A,
-        'INTELLIFLO_PUMP_12':           0x6B,
-        'INTELLIFLO_PUMP_13':           0x6C,
-        'INTELLIFLO_PUMP_14':           0x6D,
-        'INTELLIFLO_PUMP_15':           0x6E,
-        'INTELLIFLO_PUMP_16':           0x6F
-        }
+    'BROADCAST':                    0x0F,
+    'SUNTOUCH':                     0x10,
+    'EASYTOUCH':                    0x20,
+    'REMOTE_CONTROLLER':            0x21,
+    'REMOTE_WIRELESS_CONTROLLER':   0x22,
+    'QUICKTOUCH':                   0x48,
+    'INTELLIFLO_PUMP_1':            0x60,
+    'INTELLIFLO_PUMP_2':            0x61,
+    'INTELLIFLO_PUMP_3':            0x62,
+    'INTELLIFLO_PUMP_4':            0x63,
+    'INTELLIFLO_PUMP_5':            0x64,
+    'INTELLIFLO_PUMP_6':            0x65,
+    'INTELLIFLO_PUMP_7':            0x66,
+    'INTELLIFLO_PUMP_8':            0x67,
+    'INTELLIFLO_PUMP_9':            0x68,
+    'INTELLIFLO_PUMP_10':           0x69,
+    'INTELLIFLO_PUMP_11':           0x6A,
+    'INTELLIFLO_PUMP_12':           0x6B,
+    'INTELLIFLO_PUMP_13':           0x6C,
+    'INTELLIFLO_PUMP_14':           0x6D,
+    'INTELLIFLO_PUMP_15':           0x6E,
+    'INTELLIFLO_PUMP_16':           0x6F
+}
 
 SRC = ADDRESSES['REMOTE_CONTROLLER']
 
 BROADCAST_ACTIONS = {
-        'ACK_MESSAGE':                  0x01,
+    'ACK_MESSAGE':                  0x01,
 
-        'CONTROLLER_STATUS':            0x02,
-        'DELAY_CANCEL':                 0x03,
-        'DATE_TIME':                    0x05,
-        'PUMP_STATUS':                  0x07,
-        'HEATER_TEMPERATURE_STATUS':    0x08,
-        'CUSTOM_NAMES':                 0x0A,
-        'CIRCUIT_NAMES':                0x0B,
-        'HEATER_PUMP_STATUS':           0x10,
-        'SCHEDULE_DETAILS':             0x11,
-        'INTELLICHEM':                  0x12,
-        'INTELLIFLO_SPA_SIDE_CONTROL':  0x16,
-        'PUMP_STATUS_2':                0x17, # Differentation with 0x07?
-        'PUMP_CONFIG':                  0x18,
-        'INTELLICHLOR_STATUS':          0x19,
-        'PUMP_CONFIG_EXTENDED':         0x1B,
-        'VALVE_STATUS':                 0x1D,
-        'HIGH_SPEED_VALVE_CIRCUITS':    0x1E,
-        'IS4_IS10':                     0x20,
-        'INTELLIFLO_SPA_SIDE_REMOTE':   0x21,
-        'HEATER_PUMP_STATUS':           0x22,
-        'DELAY_STATUS':                 0x23,
-        'LIGHT_GROUPS':                 0x27,
-        'HEAT_SETTINGS':                0x28,
+    'CONTROLLER_STATUS':            0x02,
+    'DELAY_CANCEL':                 0x03,
+    'DATE_TIME':                    0x05,
+    'PUMP_STATUS':                  0x07,
+    'HEATER_TEMPERATURE_STATUS':    0x08,
+    'CUSTOM_NAMES':                 0x0A,
+    'CIRCUIT_NAMES':                0x0B,
+    'HEATER_PUMP_STATUS':           0x10,
+    'SCHEDULE_DETAILS':             0x11,
+    'INTELLICHEM':                  0x12,
+    'INTELLIFLO_SPA_SIDE_CONTROL':  0x16,
+    'PUMP_STATUS_2':                0x17, # Differentation with 0x07?
+    'PUMP_CONFIG':                  0x18,
+    'INTELLICHLOR_STATUS':          0x19,
+    'PUMP_CONFIG_EXTENDED':         0x1B,
+    'VALVE_STATUS':                 0x1D,
+    'HIGH_SPEED_VALVE_CIRCUITS':    0x1E,
+    'IS4_IS10':                     0x20,
+    'INTELLIFLO_SPA_SIDE_REMOTE':   0x21,
+    'HEATER_PUMP_STATUS':           0x22,
+    'DELAY_STATUS':                 0x23,
+    'LIGHT_GROUPS':                 0x27,
+    'HEAT_SETTINGS':                0x28,
 
-        'SET_COLOR':                    0x60,
-        }
+    'SET_COLOR':                    0x60,
+}
 
 # For STATUS (0x02) through HEAT_SETTINGS (0x28):
 # - Add 0x80 for Setter
@@ -78,91 +78,91 @@ SET = 0x80
 GET = 0xC0
 
 ACTIONS = {
-        'ACK_MESSAGE':      0x00,
-        'PUMP_PROGRAM':     0x01,
-        '__0x02__':         0x02,
-        'GET_TIME':         0x03,
-        'REMOTE_CONTROL':   0x04,
-        'PUMP_SPEED':       0x05,
-        'PUMP_POWER':       0x06,
-        'PUMP_STATUS':      0x07,
-        '__0x08__':         0x08,
-        '__0x09__':         0x09,
-        '__0x0A__':         0x0A,
-        'SET_DATETIME':     0x85, # Need to figure out how these align with the BROADCAST_ACTIONS, GET, and SET
-        'GET_DATETIME':     0xC5,
-        'GET_PUMP_STATUS':  0xC7,
-        'GET_SCHEDULE_DETAILS': 0xD1,
-        'GET_PUMP_CONFIG':  0xD8,
-        'ERROR':            0xFF,
-        }
+    'ACK_MESSAGE':      0x00,
+    'PUMP_PROGRAM':     0x01,
+    '__0x02__':         0x02,
+    'GET_TIME':         0x03,
+    'REMOTE_CONTROL':   0x04,
+    'PUMP_SPEED':       0x05,
+    'PUMP_POWER':       0x06,
+    'PUMP_STATUS':      0x07,
+    '__0x08__':         0x08,
+    '__0x09__':         0x09,
+    '__0x0A__':         0x0A,
+    'SET_DATETIME':     0x85, # Need to figure out how these align with the BROADCAST_ACTIONS, GET, and SET
+    'GET_DATETIME':     0xC5,
+    'GET_PUMP_STATUS':  0xC7,
+    'GET_SCHEDULE_DETAILS': 0xD1,
+    'GET_PUMP_CONFIG':  0xD8,
+    'ERROR':            0xFF,
+}
 
 PUMP_STATUS_FIELDS = {
-        'RUN':                  0,
-        'MODE':                 1,
-        'DRIVE_STATE':          2,
-        'WATTS_H':              3,
-        'WATTS_L':              4,
-        'RPM_H':                5,
-        'RPM_L':                6,
-        'GPM':                  7,
-        'PPC':                  8,
-        'UNKNOWN':              9,
-        'ERROR':                10,
-        'REMAINING_TIME_H':     11,
-        'REMAINING_TIME_M':     12,
-        'CLOCK_TIME_H':         13,
-        'CLOCK_TIME_M':         14
-        }
+    'RUN':                  0,
+    'MODE':                 1,
+    'DRIVE_STATE':          2,
+    'WATTS_H':              3,
+    'WATTS_L':              4,
+    'RPM_H':                5,
+    'RPM_L':                6,
+    'GPM':                  7,
+    'PPC':                  8,
+    'UNKNOWN':              9,
+    'ERROR':                10,
+    'REMAINING_TIME_H':     11,
+    'REMAINING_TIME_M':     12,
+    'CLOCK_TIME_H':         13,
+    'CLOCK_TIME_M':         14
+}
 
 PUMP_SPEED = {
-        'SPEED_1':      0x02,
-        'SPEED_2':      0x03,
-        'SPEED_3':      0x04,
-        'SPEED_4':      0x05,
-        'QUICK_CLEAN':  0x0a,
-        'TIME_OUT':     0x0b,
+    'SPEED_1':      0x02,
+    'SPEED_2':      0x03,
+    'SPEED_3':      0x04,
+    'SPEED_4':      0x05,
+    'QUICK_CLEAN':  0x0a,
+    'TIME_OUT':     0x0b,
 }
 
 PUMP_PROGRAM = {
-        'OFF':              0x00,
-        'RPM':              [0x02, 0xC4],
-        'GPM':              [0x02, 0xE4],
-        'EXTERNAL':         [0x03, 0x21],
-        'SET_PROGRAM_1':    [0x03, 0x27],
-        'SET_PROGRAM_2':    [0x03, 0x28],
-        'SET_PROGRAM_3':    [0x03, 0x29],
-        'SET_PROGRAM_4':    [0x03, 0x2a],
-        'SET_TIMER':        [0x03, 0x2b],
-        }
+    'OFF':              0x00,
+    'RPM':              [0x02, 0xC4],
+    'GPM':              [0x02, 0xE4],
+    'EXTERNAL':         [0x03, 0x21],
+    'SET_PROGRAM_1':    [0x03, 0x27],
+    'SET_PROGRAM_2':    [0x03, 0x28],
+    'SET_PROGRAM_3':    [0x03, 0x29],
+    'SET_PROGRAM_4':    [0x03, 0x2a],
+    'SET_TIMER':        [0x03, 0x2b],
+}
 
 PUMP_POWER = {
-        False:  0x04,
-        True:   0x0A,
-        }
+    False:  0x04,
+    True:   0x0A,
+}
 
 EXTERNAL_PROGRAM = {
-        'STOP':     0x00,
-        1:          [0x00, 0x08],
-        2:          [0x00, 0x10],
-        3:          [0x00, 0x18],
-        4:          [0x00, 0x20],
-        }
+    'STOP':     0x00,
+    1:          [0x00, 0x08],
+    2:          [0x00, 0x10],
+    3:          [0x00, 0x18],
+    4:          [0x00, 0x20],
+}
 
 REMOTE_CONTROL_MODES = {
-        False:  0x00,
-        True:   0xff
-        }
+    False:  0x00,
+    True:   0xff
+}
 
 WEEKDAYS = {
-        'SUNDAY':       1,
-        'MONDAY':       2,
-        'TUESDAY':      4,
-        'WEDNESDAY':    8,
-        'THURSDAY':     16,
-        'FRIDAY':       32,
-        'SATURDAY':     64,
-        }
+    'SUNDAY':       1,
+    'MONDAY':       2,
+    'TUESDAY':      4,
+    'WEDNESDAY':    8,
+    'THURSDAY':     16,
+    'FRIDAY':       32,
+    'SATURDAY':     64,
+}
 
 # SCHEDULE_DAYS are WEEKDAYS + 128 as the most significant bit of the mask is always high
 
