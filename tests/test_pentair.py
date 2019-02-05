@@ -1,4 +1,6 @@
 import unittest
+import random
+from nose.plugins.attrib import attr
 from app.pentair import Packet, Pump
 
 PAYLOAD_HEADER  = 0xA5
@@ -14,14 +16,17 @@ VERSION         = 0x00
 
 class TestPumpMethods(unittest.TestCase):
 
+    @attr('messy')
     def test_power_on(self):
         Pump(1).power = True
         self.assertEqual(Pump(1).power, True)
 
+    @attr('messy')
     def test_power_off(self):
         Pump(1).power = False
         self.assertEqual(Pump(1).power, False)
 
+    @attr('messy')
     def test_set_rpm(self):
         for rpm in [3000, 2500, 2000, 1100]:
             with self.subTest(rpm=rpm):
