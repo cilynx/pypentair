@@ -385,7 +385,7 @@ class Pump():
         return self.__program
 
     @property
-    def program_1(self):
+    def program_1(self): # Don't currently know a way to read this from the pump
         return self.__program_1
 
     @program_1.setter
@@ -393,6 +393,36 @@ class Pump():
         response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_1'] + bytelist(rpm))
         self.__program_1 = rpm
         return self.__program_1
+
+    @property
+    def program_2(self): # Don't currently know a way to read this from the pump
+        return self.__program_2
+
+    @program_2.setter
+    def program_2(self, rpm):
+        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_2'] + bytelist(rpm))
+        self.__program_2 = rpm
+        return self.__program_2
+
+    @property
+    def program_3(self): # Don't currently know a way to read this from the pump
+        return self.__program_3
+
+    @program_3.setter
+    def program_3(self, rpm):
+        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_3'] + bytelist(rpm))
+        self.__program_3 = rpm
+        return self.__program_3
+
+    @property
+    def program_4(self): # Don't currently know a way to read this from the pump
+        return self.__program_4
+
+    @program_4.setter
+    def program_4(self, rpm):
+        response = self.send(ACTIONS['PUMP_PROGRAM'], PUMP_PROGRAM['SET_PROGRAM_4'] + bytelist(rpm))
+        self.__program_4 = rpm
+        return self.__program_4
 
     @property
     def remote_control(self):
