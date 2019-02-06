@@ -36,6 +36,12 @@ class TestPumpMethods(unittest.TestCase):
                 # Across the usable rpm range, deviation stays <100 watts
                 self.assertAlmostEqual(Pump(1).watts, 0.0004*(rpm**2)-0.8*rpm+611, delta=100)
 
+    @attr('messy')
+    def test_programs(self):
+        for x in range(1,4):
+            Pump(1).program = x
+            self.assertEqual(Pump(1).program, x)
+
     def test_program_1(self):
         rpm = random.randint(2000,3000)
         Pump(1).program_1 = rpm

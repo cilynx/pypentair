@@ -138,19 +138,19 @@ PROGRAM = [         # Addresses for getting and setting Program RPMs
     [0x03, 0xbe],   # Also Program 4?
 ]
 
-RUN_PROGRAM = {                 # Addresses for running Programs
-    'STOP': [0x00],
-    '1':    [0x00, 0x08],   # Program 1
-    '2':    [0x00, 0x10],   # Program 2
-    '3':    [0x00, 0x18],   # Program 3
-    '4':    [0x00, 0x20],   # Program 4
-}
+RUN_PROGRAM = [     # Addresses for running Programs
+    None,
+    [0x00, 0x08],   # Program 1
+    [0x00, 0x10],   # Program 2
+    [0x00, 0x18],   # Program 3
+    [0x00, 0x20],   # Program 4
+]
 
 MODE = {
     'OFF':              [0x00],
     'RPM':              [0x02, 0xC4],
     'GPM':              [0x02, 0xE4],
-    'RUN_PROGRAM':      [0x03, 0x21],
+    'RUNNING_PROGRAM':  [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
 }
 
@@ -330,7 +330,6 @@ class Packet():
 class Pump():
     def __init__(self, index):
         self.address            = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
-        self.__program          = None
         self.__remote_control   = None
         self.__speed            = None
 
@@ -379,12 +378,11 @@ class Pump():
 
     @property
     def program(self):
-        return self.__program
+        return(int(self.send(ACTIONS['GET'], MODE['RUNNING_PROGRAM']).data[1]/8))
 
     @program.setter
     def program(self, index):
-        self.send(ACTIONS['SET'], MODE['RUN_PROGRAM'] + RUN_PROGRAM[index])
-        self.__program = index
+        self.send(ACTIONS['SET'], MODE['RUNNING_PROGRAM'] + RUN_PROGRAM[index])
 
     @property
     def program_1(self):
