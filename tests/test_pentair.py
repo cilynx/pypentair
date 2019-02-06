@@ -88,6 +88,12 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).contrast = 3
         self.assertEqual(Pump(1).contrast, 3)
 
+    def test_address(self):
+        Pump(1).address = 97
+        self.assertEqual(Pump(2).address, 97)
+        Pump(2).address = 96
+        self.assertEqual(Pump(1).address, 96)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats

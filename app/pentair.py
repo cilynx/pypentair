@@ -157,6 +157,7 @@ RUN_PROGRAM = [     # Addresses for running Programs
 SETTING = {
     'ACTUAL_RPM':       [0x02, 0x06],
     'CONTRAST':         [0x02, 0xBD],
+    'ADDRESS':          [0x02, 0xC0],
     'TARGET_RPM':       [0x02, 0xC4],
     'RAMP':             [0x02, 0xD1],
     'GPM':              [0x02, 0xE4],
@@ -340,7 +341,7 @@ class Packet():
 
 class Pump():
     def __init__(self, index):
-        self.address            = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
+        self.__address          = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
         self.__remote_control   = None
         self.__speed            = None
 
@@ -354,6 +355,18 @@ class Pump():
         self.remote_control = False
 
         return response
+
+    @property
+    def address(self):
+        return self.__address
+
+    @address.setter
+    def address(self, address):
+        self.__address = Packet(
+            dst     = self.address,
+            action  = ACTIONS['SET'],
+            data    = SETTING['ADDRESS'] + bytelist(int(address))
+        ).send().idata
 
     @property
     def celsius(self):
