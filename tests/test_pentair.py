@@ -82,6 +82,12 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).celsius = 0
         self.assertEqual(Pump(1).celsius, 0)
 
+    def test_contrast(self):
+        Pump(1).contrast = 1
+        self.assertEqual(Pump(1).contrast, 1)
+        Pump(1).contrast = 3
+        self.assertEqual(Pump(1).contrast, 3)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats

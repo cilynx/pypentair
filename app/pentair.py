@@ -148,6 +148,7 @@ RUN_PROGRAM = [     # Addresses for running Programs
 
 SETTING = {
     'ACTUAL_RPM':       [0x02, 0x06],
+    'CONTRAST':         [0x02, 0xBD],
     'TARGET_RPM':       [0x02, 0xC4],
     'RAMP':             [0x02, 0xD1],
     'GPM':              [0x02, 0xE4],
@@ -353,6 +354,14 @@ class Pump():
     @celsius.setter
     def celsius(self, state):
         self.send(ACTIONS['SET'], SETTING['CELSIUS'] + [0x00, int(state)])
+
+    @property
+    def contrast(self):
+        return self.send(ACTIONS['GET'], SETTING['CONTRAST']).idata
+
+    @contrast.setter
+    def contrast(self, state):
+        self.send(ACTIONS['SET'], SETTING['CONTRAST'] + [0x00, int(state)])
 
     @property
     def datetime(self):
