@@ -153,6 +153,7 @@ SETTING = {
     'GPM':              [0x02, 0xE4],
     'RUNNING_PROGRAM':  [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
+    'CELSIUS':          [0x03, 0x30],
 }
 
 PUMP_POWER = {
@@ -344,6 +345,14 @@ class Pump():
         self.remote_control = False
 
         return response
+
+    @property
+    def celsius(self):
+        return self.send(ACTIONS['GET'], SETTING['CELSIUS']).idata
+
+    @celsius.setter
+    def celsius(self, state):
+        self.send(ACTIONS['SET'], SETTING['CELSIUS'] + [0x00, int(state)])
 
     @property
     def datetime(self):

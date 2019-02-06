@@ -46,8 +46,8 @@ class TestPumpMethods(unittest.TestCase):
         rpm = random.randint(2000,3000)
         Pump(1).program_1 = rpm
         self.assertEqual(Pump(1).program_1, rpm)
-        Pump(1).program_1 = 1100 # Should be 750, if we can set minimum better
-        self.assertEqual(Pump(1).program_1, 1100)
+        Pump(1).program_1 = 1115 # Should be 750, if we can set minimum better
+        self.assertEqual(Pump(1).program_1, 1115)
 
     def test_program_2(self):
         rpm = random.randint(2000,3000)
@@ -75,6 +75,12 @@ class TestPumpMethods(unittest.TestCase):
         self.assertEqual(Pump(1).ramp, 100)
         Pump(1).ramp = 200
         self.assertEqual(Pump(1).ramp, 200)
+
+    def test_celsius(self):
+        Pump(1).celsius = 1
+        self.assertEqual(Pump(1).celsius, 1)
+        Pump(1).celsius = 0
+        self.assertEqual(Pump(1).celsius, 0)
 
 class TestPacketMethods(unittest.TestCase):
 
