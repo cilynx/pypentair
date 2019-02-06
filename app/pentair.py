@@ -146,10 +146,10 @@ RUN_PROGRAM = [     # Addresses for running Programs
     [0x00, 0x20],   # Program 4
 ]
 
-MODE = {
-    'OFF':              [0x00],
+SETTING = {
     'ACTUAL_RPM':       [0x02, 0x06],
     'TARGET_RPM':       [0x02, 0xC4],
+    'RAMP':             [0x02, 0xD1],
     'GPM':              [0x02, 0xE4],
     'RUNNING_PROGRAM':  [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
@@ -379,11 +379,11 @@ class Pump():
 
     @property
     def program(self):
-        return(int(self.send(ACTIONS['GET'], MODE['RUNNING_PROGRAM']).data[1]/8))
+        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).data[1]/8))
 
     @program.setter
     def program(self, index):
-        self.send(ACTIONS['SET'], MODE['RUNNING_PROGRAM'] + RUN_PROGRAM[index])
+        self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + RUN_PROGRAM[index])
 
     @property
     def program_1(self):
@@ -418,6 +418,14 @@ class Pump():
         response = self.send(ACTIONS['SET'], PROGRAM[4] + bytelist(rpm))
 
     @property
+    def ramp(self):
+        return self.send(ACTIONS['GET'], SETTING['RAMP']).idata
+
+    @ramp.setter
+    def ramp(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['RAMP'] + bytelist(rpm))
+
+    @property
     def remote_control(self):
         return self.__remote_control
 
@@ -432,17 +440,17 @@ class Pump():
 
     @property
     def rpm(self):
-        return self.send(ACTIONS['GET'], MODE['ACTUAL_RPM']).idata
+        return self.send(ACTIONS['GET'], SETTING['ACTUAL_RPM']).idata
 
     @property
     def trpm(self):
-        return self.send(ACTIONS['GET'], MODE['TARGET_RPM']).idata
+        return self.send(ACTIONS['GET'], SETTING['TARGET_RPM']).idata
 
     @rpm.setter
     def rpm(self, rpm):
         if DEBUG: print("Requesting RPM change to", rpm)
         for x in range(0,120):
-            response = self.send(ACTIONS['SET'], MODE['TARGET_RPM'] + bytelist(rpm))
+            response = self.send(ACTIONS['SET'], SETTING['TARGET_RPM'] + bytelist(rpm))
             if self.rpm == self.trpm:
                 if DEBUG: print("Successfully set RPM to ", rpm)
                 return

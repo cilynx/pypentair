@@ -70,6 +70,12 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).program_4 = 3110
         self.assertEqual(Pump(1).program_4, 3110)
 
+    def test_ramp(self):
+        Pump(1).ramp = 100
+        self.assertEqual(Pump(1).ramp, 100)
+        Pump(1).ramp = 200
+        self.assertEqual(Pump(1).ramp, 200)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
