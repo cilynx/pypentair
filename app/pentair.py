@@ -317,6 +317,10 @@ class Packet():
             return 0
 
     @property
+    def idata(self):
+        return(self.data[0]<<8|self.data[1])
+
+    @property
     def payload(self):
         if self.data_length:
             return [Packet.payload_header, Packet.version, self.dst, self.src, self.action, self.data_length] + self.data
@@ -327,10 +331,6 @@ class Pump():
     def __init__(self, index):
         self.address            = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
         self.__program          = None
-        self.__program_1        = None
-        self.__program_2        = None
-        self.__program_3        = None
-        self.__program_4        = None
         self.__remote_control   = None
         self.__speed            = None
 
@@ -387,47 +387,38 @@ class Pump():
     def program(self, index):
         self.send(ACTIONS['SET'], MODE['RUN_PROGRAM'] + RUN_PROGRAM[index])
         self.__program = index
-        return self.__program
 
     @property
-    def program_1(self): # Don't currently know a way to read this from the pump
-        return self.__program_1
+    def program_1(self):
+        return(self.send(ACTIONS['GET'], PROGRAM[1]).idata)
 
     @program_1.setter
     def program_1(self, rpm):
         response = self.send(ACTIONS['SET'], PROGRAM[1] + bytelist(rpm))
-        self.__program_1 = rpm
-        return self.__program_1
 
     @property
-    def program_2(self): # Don't currently know a way to read this from the pump
-        return self.__program_2
+    def program_2(self):
+        return(self.send(ACTIONS['GET'], PROGRAM[2]).idata)
 
     @program_2.setter
     def program_2(self, rpm):
         response = self.send(ACTIONS['SET'], PROGRAM[2] + bytelist(rpm))
-        self.__program_2 = rpm
-        return self.__program_2
 
     @property
-    def program_3(self): # Don't currently know a way to read this from the pump
-        return self.__program_3
+    def program_3(self):
+        return(self.send(ACTIONS['GET'], PROGRAM[3]).idata)
 
     @program_3.setter
     def program_3(self, rpm):
         response = self.send(ACTIONS['SET'], PROGRAM[3] + bytelist(rpm))
-        self.__program_3 = rpm
-        return self.__program_3
 
     @property
-    def program_4(self): # Don't currently know a way to read this from the pump
-        return self.__program_4
+    def program_4(self):
+        return(self.send(ACTIONS['GET'], PROGRAM[4]).idata)
 
     @program_4.setter
     def program_4(self, rpm):
         response = self.send(ACTIONS['SET'], PROGRAM[4] + bytelist(rpm))
-        self.__program_4 = rpm
-        return self.__program_4
 
     @property
     def remote_control(self):

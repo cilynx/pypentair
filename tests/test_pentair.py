@@ -36,6 +36,34 @@ class TestPumpMethods(unittest.TestCase):
                 # Across the usable rpm range, deviation stays <100 watts
                 self.assertAlmostEqual(Pump(1).watts, 0.0004*(rpm**2)-0.8*rpm+611, delta=100)
 
+    def test_program_1(self):
+        rpm = random.randint(2000,3000)
+        Pump(1).program_1 = rpm
+        self.assertEqual(Pump(1).program_1, rpm)
+        Pump(1).program_1 = 1100 # Should be 750, if we can set minimum better
+        self.assertEqual(Pump(1).program_1, 1100)
+
+    def test_program_2(self):
+        rpm = random.randint(2000,3000)
+        Pump(1).program_2 = rpm
+        self.assertEqual(Pump(1).program_2, rpm)
+        Pump(1).program_2 = 1500
+        self.assertEqual(Pump(1).program_2, 1500)
+
+    def test_program_3(self):
+        rpm = random.randint(2000,3000)
+        Pump(1).program_3 = rpm
+        self.assertEqual(Pump(1).program_3, rpm)
+        Pump(1).program_3 = 2350
+        self.assertEqual(Pump(1).program_3, 2350)
+
+    def test_program_4(self):
+        rpm = random.randint(2000,3000)
+        Pump(1).program_4 = rpm
+        self.assertEqual(Pump(1).program_4, rpm)
+        Pump(1).program_4 = 3110
+        self.assertEqual(Pump(1).program_4, 3110)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
