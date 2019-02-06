@@ -132,10 +132,10 @@ PROGRAM = [         # Addresses for getting and setting Program RPMs
     [0x03, 0x28],   # Program 2
     [0x03, 0x29],   # Program 3
     [0x03, 0x2a],   # Program 4
-    [0x03, 0xbb],   # Seems to be an alias of 0x27
-    [0x03, 0xbc],   # Seems to be an alias of 0x28
-    [0x03, 0xbd],   # Seems to be an alias of 0x29
-    [0x03, 0xbe],   # Seems to be an alias of 0x30
+    [0x03, 0xbb],   # Also Program 1?
+    [0x03, 0xbc],   # Also Program 2?
+    [0x03, 0xbd],   # Also Program 3?
+    [0x03, 0xbe],   # Also Program 4?
 ]
 
 RUN_PROGRAM = {                 # Addresses for running Programs
@@ -147,7 +147,7 @@ RUN_PROGRAM = {                 # Addresses for running Programs
 }
 
 MODE = {
-    'OFF':              0x00,
+    'OFF':              [0x00],
     'RPM':              [0x02, 0xC4],
     'GPM':              [0x02, 0xE4],
     'RUN_PROGRAM':      [0x03, 0x21],
@@ -375,8 +375,6 @@ class Pump():
                 if DEBUG: print("Successfully set power:", state)
                 return
             time.sleep(1)
-        response.inspect()
-
         raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
 
     @property
