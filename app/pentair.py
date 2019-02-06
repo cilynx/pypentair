@@ -148,7 +148,8 @@ RUN_PROGRAM = [     # Addresses for running Programs
 
 MODE = {
     'OFF':              [0x00],
-    'RPM':              [0x02, 0xC4],
+    'ACTUAL_RPM':       [0x02, 0x06],
+    'TARGET_RPM':       [0x02, 0xC4],
     'GPM':              [0x02, 0xE4],
     'RUNNING_PROGRAM':  [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
@@ -431,19 +432,22 @@ class Pump():
 
     @property
     def rpm(self):
-        return self.status['rpm']
+        return self.send(ACTIONS['GET'], MODE['ACTUAL_RPM']).idata
+
+    @property
+    def trpm(self):
+        return self.send(ACTIONS['GET'], MODE['TARGET_RPM']).idata
 
     @rpm.setter
     def rpm(self, rpm):
         if DEBUG: print("Requesting RPM change to", rpm)
         for x in range(0,120):
-            response = self.send(ACTIONS['SET'], MODE['RPM'] + bytelist(rpm))
-            if self.rpm == rpm:
+            response = self.send(ACTIONS['SET'], MODE['TARGET_RPM'] + bytelist(rpm))
+            if self.rpm == self.trpm:
                 if DEBUG: print("Successfully set RPM to ", rpm)
                 return
-            if DEBUG: print("Desired RPM:", rpm, "Actual RPM:", self.rpm)
+            if DEBUG: print("Desired RPM:", self.trpm, "Actual RPM:", self.rpm)
             time.sleep(1)
-        response.inspect()
         raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
 
     @property
