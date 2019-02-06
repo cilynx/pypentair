@@ -138,6 +138,14 @@ PROGRAM = [         # Addresses for getting and setting Program RPMs
     [0x03, 0xbe],   # Also Program 4?
 ]
 
+UNKNOWN_RPM = [ # These all went up when I raised minimum
+    [0x03, 0x35],
+    [0x03, 0x3a],
+    [0x03, 0x8d],
+    [0x03, 0xb1],
+    [0x03, 0xb6],
+]
+
 RUN_PROGRAM = [     # Addresses for running Programs
     None,
     [0x00, 0x08],   # Program 1
