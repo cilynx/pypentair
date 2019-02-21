@@ -154,16 +154,17 @@ SETTING = {
     'RAMP':             [0x02, 0xD1],
     'GPM':              [0x02, 0xE4],
     'RUNNING_PROGRAM':  [0x03, 0x21],
+    #                   [0x03, 0x27],   # 1115
     'SET_TIMER':        [0x03, 0x2b],
     'CELSIUS':          [0x03, 0x30],
     '24_HOUR':          [0x03, 0x31],
-    'UNKNOWN_MAX_1':    [0x03, 0x34],   # Moved down when setting max speed lower than current value
-    'UNKNOWN_MIN_1':    [0x03, 0x35],   # Moved up when setting min speed higher than current value
-    'UNKNOWN_MAX_2':    [0x03, 0x39],   # Moved down when setting max speed lower than current value
-    'UNKNOWN_MIN_2':    [0x03, 0x3a],   # Moved up when setting min speed higher than current value
-    'UNKNOWN_MIN_5':    [0x03, 0x8d],   # Moved up when setting min speed higher than current value
-    'UNKNOWN_MAX_3':    [0x03, 0xAE],   # Moved down when setting max speed lower than current value
-    'UNKNOWN_MIN_4':    [0x03, 0xB1],   # Moved up when setting min speed higher than current value
+    #                   [0x03, 0x34],   # 3445
+    #                   [0x03, 0x35],   # 1115
+    #                   [0x03, 0x39],   # 3445
+    #                   [0x03, 0x3A],   # 1115
+    #                   [0x03, 0x8D],   # 1115
+    #                   [0x03, 0xAE],   # 3445
+    #                   [0x03, 0xB1],   # 1115
     'MIN_SPEED':        [0x03, 0xB6],
     'MAX_SPEED':        [0x03, 0xB7],
     'PASSWORD_ENABLE':  [0x03, 0xB8],
@@ -380,7 +381,7 @@ class Pump():
 
     @ampm.setter
     def ampm(self, state):
-        self.send(ACTIONS['SET'], SETTING['24_HOUR'] + [0x00, int(not state)])
+        self.send(ACTIONS['SET'], SETTING['24_HOUR'] + bytelist(not state))
 
     @property
     def celsius(self):
@@ -388,7 +389,7 @@ class Pump():
 
     @celsius.setter
     def celsius(self, state):
-        self.send(ACTIONS['SET'], SETTING['CELSIUS'] + [0x00, int(state)])
+        self.send(ACTIONS['SET'], SETTING['CELSIUS'] + bytelist(state))
 
     @property
     def contrast(self):
@@ -396,7 +397,7 @@ class Pump():
 
     @contrast.setter
     def contrast(self, state):
-        self.send(ACTIONS['SET'], SETTING['CONTRAST'] + [0x00, int(state)])
+        self.send(ACTIONS['SET'], SETTING['CONTRAST'] + bytelist(state))
 
     @property
     def datetime(self):
