@@ -135,6 +135,33 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).quick_timer = [0, 10]
         self.assertEqual(Pump(1).quick_timer, [0, 10])
 
+    def test_prime_enable(self):
+        Pump(1).prime_enable = False
+        self.assertEqual(Pump(1).prime_enable, False)
+        Pump(1).prime_enable = True
+        self.assertEqual(Pump(1).prime_enable, True)
+
+    def test_prime_max_time(self):
+        time = random.randint(1, 30)
+        Pump(1).prime_max_time = time
+        self.assertEqual(Pump(1).prime_max_time, time)
+        Pump(1).prime_max_time = 11
+        self.assertEqual(Pump(1).prime_max_time, 11)
+
+    def test_prime_sensitivity(self):
+        sens = random.randint(1, 100)
+        Pump(1).prime_sensitivity = sens
+        self.assertEqual(Pump(1).prime_sensitivity, sens)
+        Pump(1).prime_sensitivity = 3
+        self.assertEqual(Pump(1).prime_sensitivity, 3)
+
+    def test_prime_delay(self):
+        delay = random.randint(1, 600)
+        Pump(1).prime_delay = delay
+        self.assertEqual(Pump(1).prime_delay, delay)
+        Pump(1).prime_delay = 20
+        self.assertEqual(Pump(1).prime_delay, 20)
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):

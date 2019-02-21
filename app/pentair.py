@@ -142,36 +142,39 @@ SPEED_MODES = {
 }
 
 SETTING = {
-    'ACTUAL_RPM':       [0x02, 0x06],
-    'CONTRAST':         [0x02, 0xBD],
-    'ADDRESS':          [0x02, 0xC0],
-    'TARGET_RPM':       [0x02, 0xC4],
-    'RAMP':             [0x02, 0xD1],
-    'GPM':              [0x02, 0xE4],
-    'RUNNING_PROGRAM':  [0x03, 0x21],
-    'PROGRAM_RPM':      [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program #
-    'SET_TIMER':        [0x03, 0x2B],
-    'CELSIUS':          [0x03, 0x30],
-    '24_HOUR':          [0x03, 0x31],
-    #                   [0x03, 0x34],   # 3445
-    #                   [0x03, 0x35],   # 1115
-    #                   [0x03, 0x39],   # 3445
-    #                   [0x03, 0x3A],   # 1115
-    'SPEED_MODE':       [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
-    'SPEED_RPM':        [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
-    'SCHEDULE_START':   [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
-    'SCHEDULE_END':     [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
-    'EGG_TIMER':        [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
-    'QUICK_RPM':        [0x03, 0xAE],
-    'QUICK_TIMER':      [0x03, 0xAF],
-    #                   [0x03, 0xB1],   # 1115
-    #                   [0x03, 0xB5],   # 1115
-    'MIN_SPEED':        [0x03, 0xB6],
-    'MAX_SPEED':        [0x03, 0xB7],
-    'PASSWORD_ENABLE':  [0x03, 0xB8],
-    'PASSWORD_TIMEOUT': [0x03, 0xB9],
-    'PASSWORD':         [0x03, 0xBA],
-    'PROGRAM_RPM_ALT':  [0x03, 0xBB],   # Through [0x03, 0xBE] -- offset by Program #
+    'ACTUAL_RPM':           [0x02, 0x06],
+    'CONTRAST':             [0x02, 0xBD],
+    'ADDRESS':              [0x02, 0xC0],
+    'TARGET_RPM':           [0x02, 0xC4],
+    'RAMP':                 [0x02, 0xD1],
+    'PRIME_DELAY':          [0x02, 0xD2],
+    'GPM':                  [0x02, 0xE4],
+    'PRIME_SENSITIVITY':    [0x03, 0x17],
+    'RUNNING_PROGRAM':      [0x03, 0x21],
+    'PROGRAM_RPM':          [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program #
+    'SET_TIMER':            [0x03, 0x2B],
+    'CELSIUS':              [0x03, 0x30],
+    '24_HOUR':              [0x03, 0x31],
+    #                       [0x03, 0x34],   # 3445
+    #                       [0x03, 0x35],   # 1115
+    #                       [0x03, 0x39],   # 3445
+    #                       [0x03, 0x3A],   # 1115
+    'SPEED_MODE':           [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
+    'SPEED_RPM':            [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
+    'SCHEDULE_START':       [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
+    'SCHEDULE_END':         [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
+    'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
+    'QUICK_RPM':            [0x03, 0xAE],
+    'QUICK_TIMER':          [0x03, 0xAF],
+    #                       [0x03, 0xB1],   # 1115
+    'PRIME_ENABLE':         [0x03, 0xB3],
+    'PRIME_MAX_TIME':       [0x03, 0xB5],
+    'MIN_SPEED':            [0x03, 0xB6],
+    'MAX_SPEED':            [0x03, 0xB7],
+    'PASSWORD_ENABLE':      [0x03, 0xB8],
+    'PASSWORD_TIMEOUT':     [0x03, 0xB9],
+    'PASSWORD':             [0x03, 0xBA],
+    'PROGRAM_RPM_ALT':      [0x03, 0xBB],   # Through [0x03, 0xBE] -- offset by Program #
 }
 
 PUMP_POWER = {
@@ -487,6 +490,38 @@ class Pump():
                 return
             time.sleep(1)
         raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
+
+    @property
+    def prime_enable(self):
+        return self.send(ACTIONS['GET'], SETTING['PRIME_ENABLE']).idata
+
+    @prime_enable.setter
+    def prime_enable(self, state):
+        self.send(ACTIONS['SET'], SETTING['PRIME_ENABLE'] + bytelist(state))
+
+    @property
+    def prime_delay(self):
+        return self.send(ACTIONS['GET'], SETTING['PRIME_DELAY']).idata
+
+    @prime_delay.setter
+    def prime_delay(self, minutes):
+        self.send(ACTIONS['SET'], SETTING['PRIME_DELAY'] + bytelist(minutes))
+
+    @property
+    def prime_max_time(self):
+        return self.send(ACTIONS['GET'], SETTING['PRIME_MAX_TIME']).idata
+
+    @prime_max_time.setter
+    def prime_max_time(self, minutes):
+        self.send(ACTIONS['SET'], SETTING['PRIME_MAX_TIME'] + bytelist(minutes))
+
+    @property
+    def prime_sensitivity(self):
+        return self.send(ACTIONS['GET'], SETTING['PRIME_SENSITIVITY']).idata
+
+    @prime_sensitivity.setter
+    def prime_sensitivity(self, sensitivity):
+        self.send(ACTIONS['SET'], SETTING['PRIME_SENSITIVITY'] + bytelist(sensitivity))
 
     @property
     def quick_rpm(self):
