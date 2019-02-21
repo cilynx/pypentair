@@ -489,7 +489,7 @@ class Pump():
 
     @property
     def program(self):
-        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).data[1]/8))
+        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).idata/8))
 
     @program.setter
     def program(self, index):
