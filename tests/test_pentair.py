@@ -130,6 +130,24 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).min_speed = 1100
         self.assertEqual(Pump(1).min_speed, 1100)
 
+    def test_enable_password(self):
+        Pump(1).password_enable = True
+        self.assertEqual(Pump(1).password_enable, True)
+        Pump(1).password_enable = False
+        self.assertEqual(Pump(1).password_enable, False)
+
+    def test_set_password_timeout(self):
+        Pump(1).password_timeout = 360
+        self.assertEqual(Pump(1).password_timeout, 360)
+        Pump(1).password_timeout = 10
+        self.assertEqual(Pump(1).password_timeout, 10)
+
+    def test_set_password(self):
+        Pump(1).password = 1235
+        self.assertEqual(Pump(1).password, 1235)
+        Pump(1).password = 1234
+        self.assertEqual(Pump(1).password, 1234)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats

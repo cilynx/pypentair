@@ -166,6 +166,10 @@ SETTING = {
     'UNKNOWN_MIN_4':    [0x03, 0xB1],   # Moved up when setting min speed higher than current value
     'MIN_SPEED':        [0x03, 0xB6],
     'MAX_SPEED':        [0x03, 0xB7],
+    'PASSWORD_ENABLE':  [0x03, 0xB8],
+    'PASSWORD_TIMEOUT': [0x03, 0xB9],
+    'PASSWORD':         [0x03, 0xBA],
+    #                   [0x03, 0xBB],   # 1115
 }
 
 PUMP_POWER = {
@@ -441,6 +445,30 @@ class Pump():
     @property
     def mode(self):
         return self.status['mode']
+
+    @property
+    def password_enable(self):
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD_ENABLE']).idata
+
+    @password_enable.setter
+    def password_enable(self, state):
+        self.send(ACTIONS['SET'], SETTING['PASSWORD_ENABLE'] + bytelist(state))
+
+    @property
+    def password_timeout(self):
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD_TIMEOUT']).idata
+
+    @password_timeout.setter
+    def password_timeout(self, timeout):
+        self.send(ACTIONS['SET'], SETTING['PASSWORD_TIMEOUT'] + bytelist(timeout))
+
+    @property
+    def password(self):
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD']).idata
+
+    @password.setter
+    def password(self, password):
+        self.send(ACTIONS['SET'], SETTING['PASSWORD'] + bytelist(password))
 
     @property
     def power(self):
