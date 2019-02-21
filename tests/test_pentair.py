@@ -39,8 +39,8 @@ class TestPumpMethods(unittest.TestCase):
     @attr('messy')
     def test_programs(self):
         for x in range(1,4):
-            Pump(1).program = x
-            self.assertEqual(Pump(1).program, x)
+            Pump(1).running_program = x
+            self.assertEqual(Pump(1).running_program, x)
 
     def test_ramp(self):
         Pump(1).ramp = 100
@@ -195,10 +195,10 @@ class TestProgramMethods(unittest.TestCase):
 class TestSpeedMethods(unittest.TestCase):
 
     def test_mode(self):
-        Pump(1).speed(1).mode = 0
-        self.assertEqual(Pump(1).speed(1).mode, "MANUAL")
         Pump(1).speed(1).mode = "EGG_TIMER"
         self.assertEqual(Pump(1).speed(1).mode, "EGG_TIMER")
+        Pump(1).speed(1).mode = 0
+        self.assertEqual(Pump(1).speed(1).mode, "MANUAL")
         Pump(1).speed(5).mode = "SCHEDULE"
         self.assertEqual(Pump(1).speed(5).mode, "SCHEDULE")
         Pump(1).speed(5).mode = 3
@@ -225,8 +225,8 @@ class TestSpeedMethods(unittest.TestCase):
     def test_egg_timer(self):
         Pump(1).speed(1).egg_timer = [7, 1]
         self.assertEqual(Pump(1).speed(1).egg_timer, [7, 1])
-        Pump(1).speed(1).egg_timer = [0, 10]
-        self.assertEqual(Pump(1).speed(1).egg_timer, [0, 10])
+        Pump(1).speed(1).egg_timer = [0, 5]
+        self.assertEqual(Pump(1).speed(1).egg_timer, [0, 5])
 
 class TestPacketMethods(unittest.TestCase):
 

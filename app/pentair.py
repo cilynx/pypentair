@@ -126,14 +126,6 @@ PUMP_SPEED = {
     'TIME_OUT':     0x0b,
 }
 
-RUN_PROGRAM = [     # Addresses for running Programs
-    None,
-    [0x00, 0x08],   # Program 1
-    [0x00, 0x10],   # Program 2
-    [0x00, 0x18],   # Program 3
-    [0x00, 0x20],   # Program 4
-]
-
 SPEED_MODES = {
     'MANUAL':       0,
     'EGG_TIMER':    1,
@@ -574,7 +566,7 @@ class Pump():
 
     @running_program.setter
     def running_program(self, index):
-        self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + RUN_PROGRAM[index])
+        self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + [index*8])
 
     def program(self, index):
         return Program(self, index)
