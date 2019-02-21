@@ -94,6 +94,14 @@ class TestPumpMethods(unittest.TestCase):
         Pump(2).address = 96
         self.assertEqual(Pump(1).address, 96)
 
+    def test_id(self):
+        Pump(1).id = 2
+        self.assertEqual(Pump(2).address, 97)
+        self.assertEqual(Pump(2).id, 2)
+        Pump(2).id = 1
+        self.assertEqual(Pump(1).address, 96)
+        self.assertEqual(Pump(1).id, 1)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
