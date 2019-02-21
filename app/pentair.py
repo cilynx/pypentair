@@ -146,6 +146,13 @@ RUN_PROGRAM = [     # Addresses for running Programs
     [0x00, 0x20],   # Program 4
 ]
 
+SPEED_MODES = {
+    'MANUAL':       0,
+    'EGG_TIMER':    1,
+    'SCHEDULE':     2,
+    'DISABLED':     3,
+}
+
 SETTING = {
     'ACTUAL_RPM':       [0x02, 0x06],
     'CONTRAST':         [0x02, 0xBD],
@@ -162,9 +169,14 @@ SETTING = {
     #                   [0x03, 0x35],   # 1115
     #                   [0x03, 0x39],   # 3445
     #                   [0x03, 0x3A],   # 1115
-    #                   [0x03, 0x8D],   # 1115
+    'SPEED_MODE':       [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
+    'SPEED_RPM':        [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
+    'SCHEDULE_START':   [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
+    'SCHEDULE_END':     [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
+    'EGG_TIMER':        [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
     #                   [0x03, 0xAE],   # 3445
     #                   [0x03, 0xB1],   # 1115
+    #                   [0x03, 0xB5],   # 1115
     'MIN_SPEED':        [0x03, 0xB6],
     'MAX_SPEED':        [0x03, 0xB7],
     'PASSWORD_ENABLE':  [0x03, 0xB8],
@@ -569,14 +581,17 @@ class Pump():
         raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
 
     @property
-    def speed(self):
+    def running_speed(self):
         return self.__speed
 
-    @speed.setter
-    def speed(self, speed):
+    @running_speed.setter
+    def running_speed(self, speed):
         response = self.send(ACTIONS['PUMP_SPEED'], [PUMP_SPEED[speed]])
         self.__speed = speed
         return self.__speed
+
+    def speed(self, index):
+        return Speed(self, index)
 
     @property
     def status(self):
@@ -611,6 +626,64 @@ class Pump():
     @property
     def watts(self):
         return self.status['watts']
+
+class Speed():
+    def __init__(self, pump, index):
+        self.pump   = pump
+        self.index  = index
+
+    def my(self, list):
+        return [list[0], list[1] + self.index - 1]
+
+    @property
+    def mode(self):
+        return lookup(SPEED_MODES, self.pump.send(ACTIONS['GET'], self.my(SETTING['SPEED_MODE'])).idata)
+
+    @mode.setter
+    def mode(self, mode):
+        if mode in SPEED_MODES:
+            mode = SPEED_MODES[mode]
+        else:
+            mode = int(mode)
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['SPEED_MODE']) + bytelist(mode))
+
+    @property
+    def rpm(self):
+        return self.pump.send(ACTIONS['GET'], self.my(SETTING['SPEED_RPM'])).idata
+
+    @rpm.setter
+    def rpm(self, rpm):
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['SPEED_RPM']) + bytelist(rpm))
+
+    @property
+    def schedule_start(self):
+        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['SCHEDULE_START'])).idata
+        return [int(minutes/60), minutes % 60]
+
+    @schedule_start.setter
+    def schedule_start(self, time):
+        minutes = 60 * time[0] + time[1]
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['SCHEDULE_START']) + bytelist(minutes))
+
+    @property
+    def schedule_end(self):
+        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['SCHEDULE_END'])).idata
+        return [int(minutes/60), minutes % 60]
+
+    @schedule_end.setter
+    def schedule_end(self, time):
+        minutes = 60 * time[0] + time[1]
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['SCHEDULE_END']) + bytelist(minutes))
+
+    @property
+    def egg_timer(self):
+        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['EGG_TIMER'])).idata
+        return [int(minutes/60), minutes % 60]
+
+    @egg_timer.setter
+    def egg_timer(self, time):
+        minutes = 60 * time[0] + time[1]
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['EGG_TIMER']) + bytelist(minutes))
 
 def broadcastDateTime(): #TODO Actually implement this
     broadcast(BROADCAST_ACTIONS['DATE_TIME'], [15,34, 1, 10, 7, 16, 0, 1])

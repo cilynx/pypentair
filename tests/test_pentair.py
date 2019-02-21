@@ -148,6 +148,42 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).password = 1234
         self.assertEqual(Pump(1).password, 1234)
 
+class TestSpeedMethods(unittest.TestCase):
+
+    def test_mode(self):
+        Pump(1).speed(1).mode = 0
+        self.assertEqual(Pump(1).speed(1).mode, "MANUAL")
+        Pump(1).speed(1).mode = "EGG_TIMER"
+        self.assertEqual(Pump(1).speed(1).mode, "EGG_TIMER")
+        Pump(1).speed(5).mode = "SCHEDULE"
+        self.assertEqual(Pump(1).speed(5).mode, "SCHEDULE")
+        Pump(1).speed(5).mode = 3
+        self.assertEqual(Pump(1).speed(5).mode, "DISABLED")
+
+    def test_rpm(self):
+        Pump(1).speed(1).rpm = 2000
+        self.assertEqual(Pump(1).speed(1).rpm, 2000)
+        Pump(1).speed(1).rpm = 1100
+        self.assertEqual(Pump(1).speed(1).rpm, 1100)
+
+    def test_schedule_start(self):
+        Pump(1).speed(1).schedule_start = [7, 1]
+        self.assertEqual(Pump(1).speed(1).schedule_start, [7, 1])
+        Pump(1).speed(1).schedule_start = [11, 0]
+        self.assertEqual(Pump(1).speed(1).schedule_start, [11, 0])
+
+    def test_schedule_end(self):
+        Pump(1).speed(1).schedule_end = [7, 1]
+        self.assertEqual(Pump(1).speed(1).schedule_end, [7, 1])
+        Pump(1).speed(1).schedule_end = [18, 0]
+        self.assertEqual(Pump(1).speed(1).schedule_end, [18, 0])
+
+    def test_egg_timer(self):
+        Pump(1).speed(1).egg_timer = [7, 1]
+        self.assertEqual(Pump(1).speed(1).egg_timer, [7, 1])
+        Pump(1).speed(1).egg_timer = [0, 10]
+        self.assertEqual(Pump(1).speed(1).egg_timer, [0, 10])
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
