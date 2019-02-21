@@ -138,14 +138,6 @@ PROGRAM = [         # Addresses for getting and setting Program RPMs
     [0x03, 0xbe],   # Also Program 4?
 ]
 
-UNKNOWN_RPM = [ # These all went up when I raised minimum
-    [0x03, 0x35],
-    [0x03, 0x3a],
-    [0x03, 0x8d],
-    [0x03, 0xb1],
-    [0x03, 0xb6],
-]
-
 RUN_PROGRAM = [     # Addresses for running Programs
     None,
     [0x00, 0x08],   # Program 1
@@ -165,6 +157,15 @@ SETTING = {
     'SET_TIMER':        [0x03, 0x2b],
     'CELSIUS':          [0x03, 0x30],
     '24_HOUR':          [0x03, 0x31],
+    'UNKNOWN_MAX_1':    [0x03, 0x34],   # Moved down when setting max speed lower than current value
+    'UNKNOWN_MIN_1':    [0x03, 0x35],   # Moved up when setting min speed higher than current value
+    'UNKNOWN_MAX_2':    [0x03, 0x39],   # Moved down when setting max speed lower than current value
+    'UNKNOWN_MIN_2':    [0x03, 0x3a],   # Moved up when setting min speed higher than current value
+    'UNKNOWN_MIN_5':    [0x03, 0x8d],   # Moved up when setting min speed higher than current value
+    'UNKNOWN_MAX_3':    [0x03, 0xAE],   # Moved down when setting max speed lower than current value
+    'UNKNOWN_MIN_4':    [0x03, 0xB1],   # Moved up when setting min speed higher than current value
+    'MIN_SPEED':        [0x03, 0xB6],
+    'MAX_SPEED':        [0x03, 0xB7],
 }
 
 PUMP_POWER = {
@@ -420,6 +421,22 @@ class Pump():
     @id.setter
     def id(self, id):
         self.address = id + 95
+
+    @property
+    def max_speed(self):
+        return self.send(ACTIONS['GET'], SETTING['MAX_SPEED']).idata
+
+    @max_speed.setter
+    def max_speed(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['MAX_SPEED'] + bytelist(rpm))
+
+    @property
+    def min_speed(self):
+        return self.send(ACTIONS['GET'], SETTING['MIN_SPEED']).idata
+
+    @min_speed.setter
+    def min_speed(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['MIN_SPEED'] + bytelist(rpm))
 
     @property
     def mode(self):

@@ -118,6 +118,18 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).ampm = True
         self.assertEqual(Pump(1).ampm, True)
 
+    def test_max_speed(self):
+        Pump(1).max_speed = 3445
+        self.assertEqual(Pump(1).max_speed, 3445)
+        Pump(1).max_speed = 3450
+        self.assertEqual(Pump(1).max_speed, 3450)
+
+    def test_min_speed(self):
+        Pump(1).min_speed = 1105
+        self.assertEqual(Pump(1).min_speed, 1105)
+        Pump(1).min_speed = 1100
+        self.assertEqual(Pump(1).min_speed, 1100)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
