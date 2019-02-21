@@ -397,6 +397,14 @@ class Pump():
         return self.send(ACTIONS['SET_DATETIME'], [data['hour'], data['minute'], WEEKDAYS[data['dow']], data['dom'], data['month'], data['year'], data['dst'], data['auto_dst']])
 
     @property
+    def fahrenheit(self):
+        return not self.celsius
+
+    @fahrenheit.setter
+    def fahrenheit(self, state):
+        self.celsius = not state
+
+    @property
     def id(self):
         return self.address - 95
 

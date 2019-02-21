@@ -78,9 +78,19 @@ class TestPumpMethods(unittest.TestCase):
 
     def test_celsius(self):
         Pump(1).celsius = 1
+        self.assertEqual(Pump(1).fahrenheit, 0)
         self.assertEqual(Pump(1).celsius, 1)
         Pump(1).celsius = 0
+        self.assertEqual(Pump(1).fahrenheit, 1)
         self.assertEqual(Pump(1).celsius, 0)
+
+    def test_fahrenheit(self):
+        Pump(1).fahrenheit = 1
+        self.assertEqual(Pump(1).fahrenheit, 1)
+        self.assertEqual(Pump(1).celsius, 0)
+        Pump(1).fahrenheit = 0
+        self.assertEqual(Pump(1).fahrenheit, 0)
+        self.assertEqual(Pump(1).celsius, 1)
 
     def test_contrast(self):
         Pump(1).contrast = 1
