@@ -141,28 +141,51 @@ SETTING = {
     'RAMP':                 [0x02, 0xD1],
     'PRIME_DELAY':          [0x02, 0xD2],
     'GPM':                  [0x02, 0xE4],
+
+    #                       [0x03, 0x00],   # 7860
+    #                       [0x03, 0x16],   # 1600
     'PRIME_SENSITIVITY':    [0x03, 0x17],
+    #                       [0x03, 0x18],   # 50    # Vacuum Flow?
+    #                       [0x03, 0x19],   # 55    # Max Priming Flow?
+    #                       [0x03, 0x1a],   # 30
+    #                       [0x03, 0x1b],   # 1
     'RUNNING_PROGRAM':      [0x03, 0x21],
+    #                       [0x03, 0x22],   # 0
+    #                       [0x03, 0x23],   # 0
+    #                       [0x03, 0x24],   # 0
+    #                       [0x03, 0x25],   # 0
+    #                       [0x03, 0x26],   # 0
     'PROGRAM_RPM':          [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program #
     'SET_TIMER':            [0x03, 0x2B],
+    #                       [0x03, 0x2C],   # 2
+    #                       [0x03, 0x2D],   # 1
+    #                       [0x03, 0x2E],   # 0
     'CELSIUS':              [0x03, 0x30],
     '24_HOUR':              [0x03, 0x31],
     #                       [0x03, 0x34],   # 3445
     #                       [0x03, 0x35],   # 1115
+    #                       [0x03, 0x36],   # 10
+    #                       [0x03, 0x37],   # 1
+    #                       [0x03, 0x38],   # 0
     #                       [0x03, 0x39],   # 3445
     #                       [0x03, 0x3A],   # 1115
+    #                       [0x03, 0x3B],   # 10
+    #                       [0x03, 0x3C],   # 2
+    #                       [0x03, 0x3D],   # 0
+    #                       [0x03, 0x3E],   # 0
     'SPEED_MODE':           [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
     'SPEED_RPM':            [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
     'SCHEDULE_START':       [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
     'SCHEDULE_END':         [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
     'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
+    #                       [0x03, 0xAD],   # 180
     'QUICK_RPM':            [0x03, 0xAE],
     'QUICK_TIMER':          [0x03, 0xAF],
     'ANTIFREEZE_ENABLE':    [0x03, 0xB0],
     'ANTIFREEZE_RPM':       [0x03, 0xB1],
     'ANTIFREEZE_TEMP':      [0x03, 0xB2],
-    #                       [0x03, 0xB1],   # 1115
     'PRIME_ENABLE':         [0x03, 0xB3],
+    #                       [0x03, 0xB4],   # 3450
     'PRIME_MAX_TIME':       [0x03, 0xB5],
     'MIN_SPEED':            [0x03, 0xB6],
     'MAX_SPEED':            [0x03, 0xB7],
@@ -170,6 +193,11 @@ SETTING = {
     'PASSWORD_TIMEOUT':     [0x03, 0xB9],
     'PASSWORD':             [0x03, 0xBA],
     'PROGRAM_RPM_ALT':      [0x03, 0xBB],   # Through [0x03, 0xBE] -- offset by Program #
+    #                       [0x03, 0xC0],   # 1
+    #                       [0x03, 0xC1],   # 1
+    #                       [0x03, 0xC2],   # 1441
+    #                       [0x03, 0xC3],   # 0
+    #                       [0x03, 0xC4],   # 10
 }
 
 PUMP_POWER = {
