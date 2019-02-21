@@ -162,6 +162,26 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).prime_delay = 20
         self.assertEqual(Pump(1).prime_delay, 20)
 
+    def test_antifreeze_enable(self):
+        Pump(1).antifreeze_enable = False
+        self.assertEqual(Pump(1).antifreeze_enable, False)
+        Pump(1).antifreeze_enable = True
+        self.assertEqual(Pump(1).antifreeze_enable, True)
+
+    def test_antifreeze_rpm(self):
+        rpm = random.randint(2000, 3000)
+        Pump(1).antifreeze_rpm = rpm
+        self.assertEqual(Pump(1).antifreeze_rpm, rpm)
+        Pump(1).antifreeze_rpm = 1100
+        self.assertEqual(Pump(1).antifreeze_rpm, 1100)
+
+    def test_antifreeze_temp(self):
+        temp = random.randint(40, 50)
+        Pump(1).antifreeze_temp = temp
+        self.assertEqual(Pump(1).antifreeze_temp, temp)
+        Pump(1).antifreeze_temp = 40
+        self.assertEqual(Pump(1).antifreeze_temp, 40)
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):

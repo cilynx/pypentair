@@ -166,6 +166,9 @@ SETTING = {
     'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
     'QUICK_RPM':            [0x03, 0xAE],
     'QUICK_TIMER':          [0x03, 0xAF],
+    'ANTIFREEZE_ENABLE':    [0x03, 0xB0],
+    'ANTIFREEZE_RPM':       [0x03, 0xB1],
+    'ANTIFREEZE_TEMP':      [0x03, 0xB2],
     #                       [0x03, 0xB1],   # 1115
     'PRIME_ENABLE':         [0x03, 0xB3],
     'PRIME_MAX_TIME':       [0x03, 0xB5],
@@ -386,6 +389,30 @@ class Pump():
     @ampm.setter
     def ampm(self, state):
         self.send(ACTIONS['SET'], SETTING['24_HOUR'] + bytelist(not state))
+
+    @property
+    def antifreeze_enable(self):
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_ENABLE']).idata
+
+    @antifreeze_enable.setter
+    def antifreeze_enable(self, state):
+        self.send(ACTIONS['SET'], SETTING['ANTIFREEZE_ENABLE'] + bytelist(state))
+
+    @property
+    def antifreeze_rpm(self):
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_RPM']).idata
+
+    @antifreeze_rpm.setter
+    def antifreeze_rpm(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['ANTIFREEZE_RPM'] + bytelist(rpm))
+
+    @property
+    def antifreeze_temp(self):
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_TEMP']).idata
+
+    @antifreeze_temp.setter
+    def antifreeze_temp(self, temp):
+        self.send(ACTIONS['SET'], SETTING['ANTIFREEZE_TEMP'] + bytelist(temp))
 
     @property
     def celsius(self):
