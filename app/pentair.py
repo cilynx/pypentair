@@ -164,6 +164,7 @@ SETTING = {
     'RUNNING_PROGRAM':  [0x03, 0x21],
     'SET_TIMER':        [0x03, 0x2b],
     'CELSIUS':          [0x03, 0x30],
+    '24_HOUR':          [0x03, 0x31],
 }
 
 PUMP_POWER = {
@@ -367,6 +368,14 @@ class Pump():
             action  = ACTIONS['SET'],
             data    = SETTING['ADDRESS'] + bytelist(int(address))
         ).send().idata
+
+    @property
+    def ampm(self):
+        return not self.send(ACTIONS['GET'], SETTING['24_HOUR']).idata
+
+    @ampm.setter
+    def ampm(self, state):
+        self.send(ACTIONS['SET'], SETTING['24_HOUR'] + [0x00, int(not state)])
 
     @property
     def celsius(self):

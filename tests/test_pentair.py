@@ -112,6 +112,12 @@ class TestPumpMethods(unittest.TestCase):
         self.assertEqual(Pump(1).address, 96)
         self.assertEqual(Pump(1).id, 1)
 
+    def test_ampm(self):
+        Pump(1).ampm = False
+        self.assertEqual(Pump(1).ampm, False)
+        Pump(1).ampm = True
+        self.assertEqual(Pump(1).ampm, True)
+
 class TestPacketMethods(unittest.TestCase):
 
 ### Data Length, because incoming data can have several formats
