@@ -126,18 +126,6 @@ PUMP_SPEED = {
     'TIME_OUT':     0x0b,
 }
 
-PROGRAM = [         # Addresses for getting and setting Program RPMs
-    None,
-    [0x03, 0x27],   # Program 1
-    [0x03, 0x28],   # Program 2
-    [0x03, 0x29],   # Program 3
-    [0x03, 0x2a],   # Program 4
-    [0x03, 0xbb],   # Also Program 1?
-    [0x03, 0xbc],   # Also Program 2?
-    [0x03, 0xbd],   # Also Program 3?
-    [0x03, 0xbe],   # Also Program 4?
-]
-
 RUN_PROGRAM = [     # Addresses for running Programs
     None,
     [0x00, 0x08],   # Program 1
@@ -161,8 +149,8 @@ SETTING = {
     'RAMP':             [0x02, 0xD1],
     'GPM':              [0x02, 0xE4],
     'RUNNING_PROGRAM':  [0x03, 0x21],
-    #                   [0x03, 0x27],   # 1115
-    'SET_TIMER':        [0x03, 0x2b],
+    'PROGRAM_RPM':      [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program #
+    'SET_TIMER':        [0x03, 0x2B],
     'CELSIUS':          [0x03, 0x30],
     '24_HOUR':          [0x03, 0x31],
     #                   [0x03, 0x34],   # 3445
@@ -182,7 +170,7 @@ SETTING = {
     'PASSWORD_ENABLE':  [0x03, 0xB8],
     'PASSWORD_TIMEOUT': [0x03, 0xB9],
     'PASSWORD':         [0x03, 0xBA],
-    #                   [0x03, 0xBB],   # 1115
+    'PROGRAM_RPM_ALT':  [0x03, 0xBB],   # Through [0x03, 0xBE] -- offset by Program #
 }
 
 PUMP_POWER = {
@@ -500,44 +488,15 @@ class Pump():
         raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
 
     @property
-    def program(self):
+    def running_program(self):
         return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).idata/8))
 
-    @program.setter
-    def program(self, index):
+    @running_program.setter
+    def running_program(self, index):
         self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + RUN_PROGRAM[index])
 
-    @property
-    def program_1(self):
-        return(self.send(ACTIONS['GET'], PROGRAM[1]).idata)
-
-    @program_1.setter
-    def program_1(self, rpm):
-        response = self.send(ACTIONS['SET'], PROGRAM[1] + bytelist(rpm))
-
-    @property
-    def program_2(self):
-        return(self.send(ACTIONS['GET'], PROGRAM[2]).idata)
-
-    @program_2.setter
-    def program_2(self, rpm):
-        response = self.send(ACTIONS['SET'], PROGRAM[2] + bytelist(rpm))
-
-    @property
-    def program_3(self):
-        return(self.send(ACTIONS['GET'], PROGRAM[3]).idata)
-
-    @program_3.setter
-    def program_3(self, rpm):
-        response = self.send(ACTIONS['SET'], PROGRAM[3] + bytelist(rpm))
-
-    @property
-    def program_4(self):
-        return(self.send(ACTIONS['GET'], PROGRAM[4]).idata)
-
-    @program_4.setter
-    def program_4(self, rpm):
-        response = self.send(ACTIONS['SET'], PROGRAM[4] + bytelist(rpm))
+    def program(self, index):
+        return Program(self, index)
 
     @property
     def ramp(self):
@@ -626,6 +585,22 @@ class Pump():
     @property
     def watts(self):
         return self.status['watts']
+
+class Program():
+    def __init__(self, pump, index):
+        self.pump   = pump
+        self.index  = index
+
+    def my(self, list):
+        return [list[0], list[1] + self.index - 1]
+
+    @property
+    def rpm(self):
+        return self.pump.send(ACTIONS['GET'], self.my(SETTING['PROGRAM_RPM'])).idata
+
+    @rpm.setter
+    def rpm(self, rpm):
+        self.pump.send(ACTIONS['SET'], self.my(SETTING['PROGRAM_RPM']) + bytelist(rpm))
 
 class Speed():
     def __init__(self, pump, index):

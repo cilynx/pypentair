@@ -42,34 +42,6 @@ class TestPumpMethods(unittest.TestCase):
             Pump(1).program = x
             self.assertEqual(Pump(1).program, x)
 
-    def test_program_1(self):
-        rpm = random.randint(2000,3000)
-        Pump(1).program_1 = rpm
-        self.assertEqual(Pump(1).program_1, rpm)
-        Pump(1).program_1 = 1115 # Should be 750, if we can set minimum better
-        self.assertEqual(Pump(1).program_1, 1115)
-
-    def test_program_2(self):
-        rpm = random.randint(2000,3000)
-        Pump(1).program_2 = rpm
-        self.assertEqual(Pump(1).program_2, rpm)
-        Pump(1).program_2 = 1500
-        self.assertEqual(Pump(1).program_2, 1500)
-
-    def test_program_3(self):
-        rpm = random.randint(2000,3000)
-        Pump(1).program_3 = rpm
-        self.assertEqual(Pump(1).program_3, rpm)
-        Pump(1).program_3 = 2350
-        self.assertEqual(Pump(1).program_3, 2350)
-
-    def test_program_4(self):
-        rpm = random.randint(2000,3000)
-        Pump(1).program_4 = rpm
-        self.assertEqual(Pump(1).program_4, rpm)
-        Pump(1).program_4 = 3110
-        self.assertEqual(Pump(1).program_4, 3110)
-
     def test_ramp(self):
         Pump(1).ramp = 100
         self.assertEqual(Pump(1).ramp, 100)
@@ -147,6 +119,16 @@ class TestPumpMethods(unittest.TestCase):
         self.assertEqual(Pump(1).password, 1235)
         Pump(1).password = 1234
         self.assertEqual(Pump(1).password, 1234)
+
+class TestProgramMethods(unittest.TestCase):
+
+    def test_rpm(self):
+        for x in range(1, 5):
+            rpm = random.randint(2000,3000)
+            Pump(1).program(x).rpm = rpm
+            self.assertEqual(Pump(1).program(x).rpm, rpm)
+            Pump(1).program(x).rpm = 1100
+            self.assertEqual(Pump(1).program(x).rpm, 1100)
 
 class TestSpeedMethods(unittest.TestCase):
 
