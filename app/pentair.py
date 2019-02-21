@@ -162,7 +162,8 @@ SETTING = {
     'SCHEDULE_START':   [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
     'SCHEDULE_END':     [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
     'EGG_TIMER':        [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
-    #                   [0x03, 0xAE],   # 3445
+    'QUICK_RPM':        [0x03, 0xAE],
+    'QUICK_TIMER':      [0x03, 0xAF],
     #                   [0x03, 0xB1],   # 1115
     #                   [0x03, 0xB5],   # 1115
     'MIN_SPEED':        [0x03, 0xB6],
@@ -486,6 +487,24 @@ class Pump():
                 return
             time.sleep(1)
         raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
+
+    @property
+    def quick_rpm(self):
+        return self.send(ACTIONS['GET'], SETTING['QUICK_RPM']).idata
+
+    @quick_rpm.setter
+    def quick_rpm(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['QUICK_RPM'] + bytelist(rpm))
+
+    @property
+    def quick_timer(self):
+        minutes = self.send(ACTIONS['GET'], SETTING['QUICK_TIMER']).idata
+        return [int(minutes/60), minutes % 60]
+
+    @quick_timer.setter
+    def quick_timer(self, time):
+        minutes = 60 * time[0] + time[1]
+        self.send(ACTIONS['SET'], SETTING['QUICK_TIMER'] + bytelist(minutes))
 
     @property
     def running_program(self):

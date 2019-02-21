@@ -120,6 +120,21 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).password = 1234
         self.assertEqual(Pump(1).password, 1234)
 
+    def test_quick_clean(self):
+        rpm = random.randint(2000,3000)
+        Pump(1).quick_rpm = rpm
+        self.assertEqual(Pump(1).quick_rpm, rpm)
+        Pump(1).quick_rpm = 2000
+        self.assertEqual(Pump(1).quick_rpm, 2000)
+
+    def test_quick_timer(self):
+        hours = random.randint(0,9)
+        minutes = random.randint(0,59)
+        Pump(1).quick_timer = [hours, minutes]
+        self.assertEqual(Pump(1).quick_timer, [hours, minutes])
+        Pump(1).quick_timer = [0, 10]
+        self.assertEqual(Pump(1).quick_timer, [0, 10])
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):
