@@ -178,7 +178,7 @@ SETTING = {
     'SCHEDULE_START':       [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
     'SCHEDULE_END':         [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
     'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
-    #                       [0x03, 0xAD],   # 180
+    'TIME_OUT_TIMER':       [0x03, 0xAD],
     'QUICK_RPM':            [0x03, 0xAE],
     'QUICK_TIMER':          [0x03, 0xAF],
     'ANTIFREEZE_ENABLE':    [0x03, 0xB0],
@@ -698,6 +698,16 @@ class Pump():
     @property
     def timer(self):
         return self.status['timer']
+
+    @property
+    def time_out_timer(self):
+        minutes = self.send(ACTIONS['GET'], SETTING['TIME_OUT_TIMER']).idata
+        return [int(minutes/60), minutes % 60]
+
+    @time_out_timer.setter
+    def time_out_timer(self, time):
+        minutes = 60 * time[0] + time[1]
+        self.send(ACTIONS['SET'], SETTING['TIME_OUT_TIMER'] + bytelist(minutes))
 
     @property
     def watts(self):

@@ -195,6 +195,14 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).svrs_restart_timer = 120
         self.assertEqual(Pump(1).svrs_restart_timer, 120)
 
+    def test_time_out_timer(self):
+        hours = random.randint(0,9)
+        minutes = random.randint(0,59)
+        Pump(1).time_out_timer = [hours, minutes]
+        self.assertEqual(Pump(1).time_out_timer, [hours, minutes])
+        Pump(1).time_out_timer = [3, 0]
+        self.assertEqual(Pump(1).time_out_timer, [3, 0])
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):
