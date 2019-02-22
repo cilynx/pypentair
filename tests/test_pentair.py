@@ -182,6 +182,19 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).antifreeze_temp = 40
         self.assertEqual(Pump(1).antifreeze_temp, 40)
 
+    def test_svrs_restart_enable(self):
+        Pump(1).svrs_restart_enable = False
+        self.assertEqual(Pump(1).svrs_restart_enable, False)
+        Pump(1).svrs_restart_enable = True
+        self.assertEqual(Pump(1).svrs_restart_enable, True)
+
+    def test_svrs_restart_timer(self):
+        seconds = random.randint(30, 300)
+        Pump(1).svrs_restart_timer = seconds
+        self.assertEqual(Pump(1).svrs_restart_timer, seconds)
+        Pump(1).svrs_restart_timer = 120
+        self.assertEqual(Pump(1).svrs_restart_timer, 120)
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):

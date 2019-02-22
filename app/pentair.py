@@ -147,8 +147,8 @@ SETTING = {
     'PRIME_SENSITIVITY':    [0x03, 0x17],
     #                       [0x03, 0x18],   # 50    # Vacuum Flow?
     #                       [0x03, 0x19],   # 55    # Max Priming Flow?
-    #                       [0x03, 0x1a],   # 30
-    #                       [0x03, 0x1b],   # 1
+    'SVRS_RESTART_TIMER':   [0x03, 0x1A],
+    'SVRS_RESTART_ENABLE':  [0x03, 0x1B],
     'RUNNING_PROGRAM':      [0x03, 0x21],
     #                       [0x03, 0x22],   # 0
     #                       [0x03, 0x23],   # 0
@@ -672,6 +672,22 @@ class Pump():
                 }
         else:
             return False
+
+    @property
+    def svrs_restart_enable(self):
+        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_ENABLE']).idata
+
+    @svrs_restart_enable.setter
+    def svrs_restart_enable(self, state):
+        self.send(ACTIONS['SET'], SETTING['SVRS_RESTART_ENABLE'] + bytelist(state))
+
+    @property
+    def svrs_restart_timer(self):
+        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_TIMER']).idata
+
+    @svrs_restart_timer.setter
+    def svrs_restart_timer(self, seconds):
+        self.send(ACTIONS['SET'], SETTING['SVRS_RESTART_TIMER'] + bytelist(seconds))
 
     @property
     def time(self):
