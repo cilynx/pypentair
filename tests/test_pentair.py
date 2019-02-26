@@ -249,10 +249,11 @@ class TestSpeedMethods(unittest.TestCase):
         self.assertEqual(Pump(1).speed(1).schedule_end, [18, 0])
 
     def test_egg_timer(self):
-        Pump(1).speed(1).egg_timer = [7, 1]
-        self.assertEqual(Pump(1).speed(1).egg_timer, [7, 1])
-        Pump(1).speed(1).egg_timer = [0, 5]
-        self.assertEqual(Pump(1).speed(1).egg_timer, [0, 5])
+        for speed in Pump(1).speeds:
+            speed.egg_timer = [7, 1]
+            self.assertEqual(Pump(1).speed(speed.index).egg_timer, [7, 1])
+            speed.egg_timer = [0, 5]
+            self.assertEqual(Pump(1).speed(speed.index).egg_timer, [0, 5])
 
 class TestPacketMethods(unittest.TestCase):
 

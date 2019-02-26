@@ -685,6 +685,10 @@ class Pump():
         return Speed(self, index)
 
     @property
+    def speeds(self):
+        return [self.speed(index) for index in range(1,9)]
+
+    @property
     def status(self):
         response = self.send(ACTIONS['PUMP_STATUS'])
         # We should be able to get rid of this sanity check once we implement
