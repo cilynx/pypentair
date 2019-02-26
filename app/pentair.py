@@ -122,6 +122,10 @@ PUMP_SPEED = {
     'SPEED_2':      0x03,
     'SPEED_3':      0x04,
     'SPEED_4':      0x05,
+    'SPEED_5':      0x06,
+    'SPEED_6':      0x07,
+    'SPEED_7':      0x08,
+    'SPEED_8':      0x09,
     'QUICK_CLEAN':  0x0a,
     'TIME_OUT':     0x0b,
 }
