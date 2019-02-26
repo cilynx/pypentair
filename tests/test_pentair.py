@@ -1,7 +1,7 @@
 import unittest
 import random
 from nose.plugins.attrib import attr
-from app.pentair import Packet, Pump
+from pypentair import Packet, Pump
 
 PAYLOAD_HEADER  = 0xA5
 SRC             = 0x21
