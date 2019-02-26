@@ -623,6 +623,10 @@ class Pump():
         return Program(self, index)
 
     @property
+    def programs(self):
+        return [self.program(index) for index in range(1,5)]
+
+    @property
     def ramp(self):
         return self.send(ACTIONS['GET'], SETTING['RAMP']).idata
 

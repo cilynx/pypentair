@@ -211,12 +211,12 @@ class TestPumpMethods(unittest.TestCase):
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):
-        for x in range(1, 5):
+        for program in Pump(1).programs:
             rpm = random.randint(2000,3000)
-            Pump(1).program(x).rpm = rpm
-            self.assertEqual(Pump(1).program(x).rpm, rpm)
-            Pump(1).program(x).rpm = 1100
-            self.assertEqual(Pump(1).program(x).rpm, 1100)
+            program.rpm = rpm
+            self.assertEqual(Pump(1).program(program.index).rpm, rpm)
+            program.rpm = 1100
+            self.assertEqual(Pump(1).program(program.index).rpm, 1100)
 
 class TestSpeedMethods(unittest.TestCase):
 
