@@ -222,6 +222,17 @@ WEEKDAYS = {
 
 # SCHEDULE_DAYS are WEEKDAYS + 128 as the most significant bit of the mask is always high
 
+STYLE = {
+    'HEADER':       '\033[95m',
+    'OKBLUE':       '\033[94m',
+    'OKGREEN':      '\033[92m',
+    'WARNING':      '\033[93m',
+    'FAIL':         '\033[91m',
+    'ENDC':         '\033[0m',
+    'BOLD':         '\033[1m',
+    'UNDERLINE':    '\033[4m',
+}
+
 def bytelist(x):
     return list(x.to_bytes(2, byteorder='big'))
 
@@ -301,12 +312,14 @@ class Packet():
     def send(self):
         RS485.write(bytearray(self.bytes))
         if DEBUG: print()
-        if DEBUG: print("Request: ", self.bytes)
+        if DEBUG: print(STYLE['OKGREEN'] + "Request: ", self.bytes, STYLE['ENDC'])
         response = getResponse()
-        if DEBUG: print("Response:", response.bytes)
+        if DEBUG: print(STYLE['OKBLUE'] + "Response:", response.bytes, STYLE['ENDC'])
         if response.action == self.action:
             return response
         elif response.action == ACTIONS['ERROR']:
+            if DEBUG:
+                print(STYLE['FAIL'], "ERROR:", response.bytes[9], STYLE['ENDC'])
             if RAISE_PACKET_ERRORS:
                 raise ValueError("Received an ERROR {} from the pump".format(response.bytes[9]), response.bytes)
             return response
