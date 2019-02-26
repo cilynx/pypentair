@@ -138,7 +138,13 @@ SPEED_MODES = {
 }
 
 SETTING = {
+    #                       [0x01, 0xC4],   # 100
+    #                       [0x01, 0xFE],   # Changes often, generally in increments of 0x40.
+
     'ACTUAL_RPM':           [0x02, 0x06],
+    #                       [0x02, 0x0A],   # Always just a bit lower than Watts from PUMP_STATUS
+    #                       [0x02, 0x1A],   # [0x00, 0x00] to [0x51, 0x07] on SVRS alarm, back to 0 on reprime
+    #                       [0x02, 0x1C],   # [0x00, 0x00] to [0xff, 0xff] on SVRS alarm, back to 0 on reprime
     'CONTRAST':             [0x02, 0xBD],
     'ADDRESS':              [0x02, 0xC0],
     'TARGET_RPM':           [0x02, 0xC4],
@@ -168,12 +174,12 @@ SETTING = {
     '24_HOUR':              [0x03, 0x31],
     #                       [0x03, 0x34],   # 3445
     #                       [0x03, 0x35],   # 1115
-    #                       [0x03, 0x36],   # 10
+    #                       [0x03, 0x36],   # 10  Error 25 if I try to set it to anything
     #                       [0x03, 0x37],   # 1
     #                       [0x03, 0x38],   # 0
     #                       [0x03, 0x39],   # 3445
     #                       [0x03, 0x3A],   # 1115
-    #                       [0x03, 0x3B],   # 10
+    #                       [0x03, 0x3B],   # 10  Error 25 if I try to set it to anything
     #                       [0x03, 0x3C],   # 2
     #                       [0x03, 0x3D],   # 0
     #                       [0x03, 0x3E],   # 0
@@ -189,7 +195,7 @@ SETTING = {
     'ANTIFREEZE_RPM':       [0x03, 0xB1],
     'ANTIFREEZE_TEMP':      [0x03, 0xB2],
     'PRIME_ENABLE':         [0x03, 0xB3],
-    #                       [0x03, 0xB4],   # 3450
+    #                       [0x03, 0xB4],   # 3450 Prime RPM?
     'PRIME_MAX_TIME':       [0x03, 0xB5],
     'MIN_SPEED':            [0x03, 0xB6],
     'MAX_SPEED':            [0x03, 0xB7],
