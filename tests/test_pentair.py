@@ -203,6 +203,11 @@ class TestPumpMethods(unittest.TestCase):
         Pump(1).time_out_timer = [3, 0]
         self.assertEqual(Pump(1).time_out_timer, [3, 0])
 
+    def test_soft_prime_counter(self):
+        self.assertEqual(Pump(1).soft_prime_counter, 10)
+        # To really test this, we need to stall the pump.
+        # TODO: Revisit this once valve automation is done.
+
 class TestProgramMethods(unittest.TestCase):
 
     def test_rpm(self):

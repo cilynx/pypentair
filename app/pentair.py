@@ -201,7 +201,7 @@ SETTING = {
     #                       [0x03, 0xC1],   # 1
     #                       [0x03, 0xC2],   # 1441
     #                       [0x03, 0xC3],   # 0
-    #                       [0x03, 0xC4],   # 10
+    'SOFT_PRIME_COUNTER':   [0x03, 0xC4],   # Error 11 when trying to set.
 }
 
 PUMP_POWER = {
@@ -666,6 +666,14 @@ class Pump():
         response = self.send(ACTIONS['PUMP_SPEED'], [PUMP_SPEED[speed]])
         self.__speed = speed
         return self.__speed
+
+    @property
+    def soft_prime_counter(self):
+        return self.send(ACTIONS['GET'], SETTING['SOFT_PRIME_COUNTER']).idata
+
+    @soft_prime_counter.setter
+    def soft_prime_counter(self, minutes):
+        self.send(ACTIONS['SET'], SETTING['SOFT_PRIME_COUNTER'] + bytelist(minutes))
 
     def speed(self, index):
         return Speed(self, index)
