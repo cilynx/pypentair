@@ -655,6 +655,10 @@ class Pump():
     def trpm(self):
         return self.send(ACTIONS['GET'], SETTING['TARGET_RPM']).idata
 
+    @trpm.setter
+    def trpm(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['TARGET_RPM'] + bytelist(rpm))
+
     @rpm.setter
     def rpm(self, rpm):
         if DEBUG: print("Requesting RPM change to", rpm)
