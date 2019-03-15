@@ -144,7 +144,7 @@ SETTING = {
     'ACTUAL_RPM':           [0x02, 0x06],
     #                       [0x02, 0x0A],   # Always just a bit lower than Watts from PUMP_STATUS
     #                       [0x02, 0x1A],   # [0x00, 0x00] to [0x51, 0x07] on SVRS alarm, back to 0 on reprime
-    #                       [0x02, 0x1C],   # [0x00, 0x00] to [0xff, 0xff] on SVRS alarm, back to 0 on reprime
+    'SVRS_ALARM':           [0x02, 0x1C],   # [0x00, 0x00] to [0xff, 0xff] on SVRS alarm, back to 0 on reprime
     'CONTRAST':             [0x02, 0xBD],
     'ADDRESS':              [0x02, 0xC0],
     'TARGET_RPM':           [0x02, 0xC4],
@@ -715,6 +715,10 @@ class Pump():
                 }
         else:
             return False
+
+    @property
+    def svrs_alarm(self):
+        return self.send(ACTIONS['GET'], SETTING['SVRS_ALARM']).idata
 
     @property
     def svrs_restart_enable(self):
