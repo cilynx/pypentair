@@ -404,12 +404,12 @@ class Pump():
 
     def send(self, action, data=None):
 
-        self.remote_control = True
+#        self.remote_control = True
         response = Packet(dst=self.address, action=action, data=data).send()
         # Should add some error checking and retry logic here -- confirm that
         # the response packet is for the same action we sent or handle the
         # error if not.
-        self.remote_control = False
+#        self.remote_control = False
 
         return response
 
