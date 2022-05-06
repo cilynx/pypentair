@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from .program import Program
+
 DEBUG               = True
 INSPECT_STATUS      = False
 RAISE_PACKET_ERRORS = False
@@ -85,7 +87,7 @@ ACTIONS = {
     'GET':              0x02,
     'GET_TIME':         0x03,
     'REMOTE_CONTROL':   0x04,
-    'PUMP_SPEED':       0x05,
+    'PUMP_PROGRAM':     0x05,
     'PUMP_POWER':       0x06,
     'PUMP_STATUS':      0x07,
     '__0x08__':         0x08,
@@ -117,25 +119,41 @@ PUMP_STATUS_FIELDS = {
     'CLOCK_TIME_M':         14
 }
 
-PUMP_SPEED = {
-    'SPEED_1':      0x02,
-    'SPEED_2':      0x03,
-    'SPEED_3':      0x04,
-    'SPEED_4':      0x05,
-    'SPEED_5':      0x06,
-    'SPEED_6':      0x07,
-    'SPEED_7':      0x08,
-    'SPEED_8':      0x09,
+PUMP_PROGRAM = {
+    'PROGRAM_1':    0x02,
+    'PROGRAM_2':    0x03,
+    'PROGRAM_3':    0x04,
+    'PROGRAM_4':    0x05,
+    'PROGRAM_5':    0x06,
+    'PROGRAM_6':    0x07,
+    'PROGRAM_7':    0x08,
+    'PROGRAM_8':    0x09,
     'QUICK_CLEAN':  0x0a,
     'TIME_OUT':     0x0b,
 }
 
-SPEED_MODES = {
-    'MANUAL':       0,
-    'EGG_TIMER':    1,
-    'SCHEDULE':     2,
-    'DISABLED':     3,
-}
+# Programs 1-4 can be programmed in all three modes.
+# Programs 5-8 can only be programmed in Schedule
+# mode since there are no buttons on the control panel
+# for Programs 5-8.  The default setting for Programs 5-8
+# is "Disabled".
+#
+# - Manual
+#   - Set Type
+#     - Set Speed
+#     - Set Flow
+# - Schedule
+#   - Set Type
+#     - Set Speed
+#     - Set Flow
+#   - Set Start Time
+#   - Set Stop Time
+# - Egg Timer
+#   - Set Type
+#     - Set Speed
+#     - Set Flow
+#   - Set Duration
+
 
 SETTING = {
     #                       [0x01, 0xC4],   # 100
@@ -165,7 +183,7 @@ SETTING = {
     #                       [0x03, 0x24],   # 0
     #                       [0x03, 0x25],   # 0
     #                       [0x03, 0x26],   # 0
-    'PROGRAM_RPM':          [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program #
+#    'PROGRAM_RPM':          [0x03, 0x27],   # Through [0x03, 0x2A] -- offset by Program # I think this is wrong
     'SET_TIMER':            [0x03, 0x2B],
     #                       [0x03, 0x2C],   # 2
     #                       [0x03, 0x2D],   # 1
@@ -183,11 +201,14 @@ SETTING = {
     #                       [0x03, 0x3C],   # 2
     #                       [0x03, 0x3D],   # 0
     #                       [0x03, 0x3E],   # 0
-    'SPEED_MODE':           [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
-    'SPEED_RPM':            [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
-    'SCHEDULE_START':       [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
-    'SCHEDULE_END':         [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
-    'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
+
+    # Moved to Program() class
+    # 'PROGRAM_MODE':           [0x03, 0x85],   # Through [0x03, 0x8C] -- offset by Speed #
+    # 'PROGRAM_RPM':            [0x03, 0x8D],   # Through [0x03, 0x94] -- offset by Speed #
+    # 'SCHEDULE_START':       [0x03, 0x95],   # Through [0x03, 0x9C] -- offset by Speed #
+    # 'SCHEDULE_END':         [0x03, 0x9D],   # Through [0x03, 0xA4] -- offset by Speed #
+    # 'EGG_TIMER':            [0x03, 0xA5],   # Through [0x03, 0xAC] -- offset by Speed #
+
     'TIME_OUT_TIMER':       [0x03, 0xAD],
     'QUICK_RPM':            [0x03, 0xAE],
     'QUICK_TIMER':          [0x03, 0xAF],
@@ -197,8 +218,8 @@ SETTING = {
     'PRIME_ENABLE':         [0x03, 0xB3],
     #                       [0x03, 0xB4],   # 3450 Prime RPM?
     'PRIME_MAX_TIME':       [0x03, 0xB5],
-    'MIN_SPEED':            [0x03, 0xB6],
-    'MAX_SPEED':            [0x03, 0xB7],
+    'MIN_RPM':              [0x03, 0xB6],
+    'MAX_RPM':              [0x03, 0xB7],
     'PASSWORD_ENABLE':      [0x03, 0xB8],
     'PASSWORD_TIMEOUT':     [0x03, 0xB9],
     'PASSWORD':             [0x03, 0xBA],
@@ -396,21 +417,26 @@ class Packet():
         else:
             return [Packet.payload_header, Packet.version, self.dst, self.src, self.action, self.data_length]
 
+
 class Pump():
     def __init__(self, index):
         self.__address          = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
         self.__remote_control   = None
-        self.__speed            = None
+        self.__program          = None
+
+    def get(self, address):
+        return self.send(ACTIONS['GET'], address).idata
+
+    def set(self, address, value):
+        return self.send(ACTIONS['SET'], address + bytelist(value)).idata
 
     def send(self, action, data=None):
-
-#        self.remote_control = True
+        # self.remote_control = True
         response = Packet(dst=self.address, action=action, data=data).send()
         # Should add some error checking and retry logic here -- confirm that
         # the response packet is for the same action we sent or handle the
         # error if not.
-#        self.remote_control = False
-
+        # self.remote_control = False
         return response
 
     @property
@@ -502,20 +528,20 @@ class Pump():
         self.address = id + 95
 
     @property
-    def max_speed(self):
-        return self.send(ACTIONS['GET'], SETTING['MAX_SPEED']).idata
+    def max_rpm(self):
+        return self.send(ACTIONS['GET'], SETTING['MAX_RPM']).idata
 
-    @max_speed.setter
-    def max_speed(self, rpm):
-        self.send(ACTIONS['SET'], SETTING['MAX_SPEED'] + bytelist(rpm))
+    @max_rpm.setter
+    def max_rpm(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['MAX_RPM'] + bytelist(rpm))
 
     @property
-    def min_speed(self):
-        return self.send(ACTIONS['GET'], SETTING['MIN_SPEED']).idata
+    def min_rpm(self):
+        return self.send(ACTIONS['GET'], SETTING['MIN_RPM']).idata
 
-    @min_speed.setter
-    def min_speed(self, rpm):
-        self.send(ACTIONS['SET'], SETTING['MIN_SPEED'] + bytelist(rpm))
+    @min_rpm.setter
+    def min_rpm(self, rpm):
+        self.send(ACTIONS['SET'], SETTING['MIN_RPM'] + bytelist(rpm))
 
     @property
     def mode(self):
@@ -624,7 +650,7 @@ class Pump():
 
     @property
     def programs(self):
-        return [self.program(index) for index in range(1,5)]
+        return [self.program(index) for index in range(1, 9)]
 
     @property
     def ramp(self):
@@ -672,14 +698,14 @@ class Pump():
         raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
 
     @property
-    def running_speed(self):
-        return self.__speed
+    def running_program(self):
+        return self.__program
 
-    @running_speed.setter
-    def running_speed(self, speed):
-        response = self.send(ACTIONS['PUMP_SPEED'], [PUMP_SPEED[speed]])
-        self.__speed = speed
-        return self.__speed
+    @running_program.setter
+    def running_program(self, id):
+        self.send(ACTIONS['PUMP_PROGRAM'], [PUMP_PROGRAM[id]])
+        self.__program = id
+        return self.__program
 
     @property
     def soft_prime_counter(self):
@@ -688,13 +714,6 @@ class Pump():
     @soft_prime_counter.setter
     def soft_prime_counter(self, minutes):
         self.send(ACTIONS['SET'], SETTING['SOFT_PRIME_COUNTER'] + bytelist(minutes))
-
-    def speed(self, index):
-        return Speed(self, index)
-
-    @property
-    def speeds(self):
-        return [self.speed(index) for index in range(1,9)]
 
     @property
     def status(self):
@@ -760,79 +779,6 @@ class Pump():
     def watts(self):
         return self.status['watts']
 
-class Program():
-    def __init__(self, pump, index):
-        self.pump   = pump
-        self.index  = index
-
-    def my(self, list):
-        return [list[0], list[1] + self.index - 1]
-
-    @property
-    def rpm(self):
-        return self.pump.send(ACTIONS['GET'], self.my(SETTING['PROGRAM_RPM'])).idata
-
-    @rpm.setter
-    def rpm(self, rpm):
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['PROGRAM_RPM']) + bytelist(rpm))
-
-class Speed():
-    def __init__(self, pump, index):
-        self.pump   = pump
-        self.index  = index
-
-    def my(self, list):
-        return [list[0], list[1] + self.index - 1]
-
-    @property
-    def mode(self):
-        return lookup(SPEED_MODES, self.pump.send(ACTIONS['GET'], self.my(SETTING['SPEED_MODE'])).idata)
-
-    @mode.setter
-    def mode(self, mode):
-        if mode in SPEED_MODES:
-            mode = SPEED_MODES[mode]
-        else:
-            mode = int(mode)
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['SPEED_MODE']) + bytelist(mode))
-
-    @property
-    def rpm(self):
-        return self.pump.send(ACTIONS['GET'], self.my(SETTING['SPEED_RPM'])).idata
-
-    @rpm.setter
-    def rpm(self, rpm):
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['SPEED_RPM']) + bytelist(rpm))
-
-    @property
-    def schedule_start(self):
-        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['SCHEDULE_START'])).idata
-        return [int(minutes/60), minutes % 60]
-
-    @schedule_start.setter
-    def schedule_start(self, time):
-        minutes = 60 * time[0] + time[1]
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['SCHEDULE_START']) + bytelist(minutes))
-
-    @property
-    def schedule_end(self):
-        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['SCHEDULE_END'])).idata
-        return [int(minutes/60), minutes % 60]
-
-    @schedule_end.setter
-    def schedule_end(self, time):
-        minutes = 60 * time[0] + time[1]
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['SCHEDULE_END']) + bytelist(minutes))
-
-    @property
-    def egg_timer(self):
-        minutes = self.pump.send(ACTIONS['GET'], self.my(SETTING['EGG_TIMER'])).idata
-        return [int(minutes/60), minutes % 60]
-
-    @egg_timer.setter
-    def egg_timer(self, time):
-        minutes = 60 * time[0] + time[1]
-        self.pump.send(ACTIONS['SET'], self.my(SETTING['EGG_TIMER']) + bytelist(minutes))
 
 def broadcastDateTime(): #TODO Actually implement this
     broadcast(BROADCAST_ACTIONS['DATE_TIME'], [15,34, 1, 10, 7, 16, 0, 1])
