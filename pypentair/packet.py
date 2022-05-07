@@ -1,32 +1,32 @@
 import serial
 
-STYLE = {
-    'HEADER':       '\033[95m',
-    'OKBLUE':       '\033[94m',
-    'OKGREEN':      '\033[92m',
-    'WARNING':      '\033[93m',
-    'FAIL':         '\033[91m',
-    'ENDC':         '\033[0m',
-    'BOLD':         '\033[1m',
-    'UNDERLINE':    '\033[4m',
-}
-
-FIELDS = {
-    'PREAMBLE_0':       0,
-    'PREAMBLE_1':       1,
-    'PREAMBLE_2':       2,
-    'HEADER':           3,
-    'VERSION':          4,
-    'DST':              5,
-    'SRC':              6,
-    'ACTION':           7,
-    'DATA_LENGTH':      8,
-    'DATA':             9,
-}
+DEBUG = True
 
 ERROR = 0xFF
 
-DEBUG = True
+
+class Style():
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+class Fields():
+    PREAMBLE_0 = 0
+    PREAMBLE_1 = 1
+    PREAMBLE_2 = 2
+    HEADER = 3
+    VERSION = 4
+    DST = 5
+    SRC = 6
+    ACTION = 7
+    DATA_LENGTH = 8
+    DATA = 9
 
 
 class RS485(serial.Serial):
@@ -45,7 +45,7 @@ class RS485(serial.Serial):
                 pbytes.append(c)
                 if len(pbytes) > 4:
                     pbytes.pop(0)
-                if pbytes == Packet.preamble + [Packet.header]:
+                if pbytes == Packet.PREAMBLE + [Packet.HEADER]:
                     pbytes.extend(list(self.read(4)))  # Version, DST, SRC, Action
                     data_length = ord(self.read())
                     pbytes.append(data_length)
@@ -58,9 +58,9 @@ rs485 = RS485()
 
 
 class Packet():
-    preamble = [0xFF, 0x00, 0xFF]
-    header = 0xA5
-    version = 0x00
+    PREAMBLE = [0xFF, 0x00, 0xFF]
+    HEADER = 0xA5
+    VERSION = 0x00
 
     def __init__(self, *args, src=0x21, dst=None, action=None, data=None):
         if args != ():
@@ -79,48 +79,48 @@ class Packet():
         if DEBUG:
             print()
         if DEBUG:
-            print(STYLE['OKGREEN'] + "Request: ", self.bytes, STYLE['ENDC'])
+            print(Style.OKGREEN + "Request: ", self.bytes, Style.ENDC)
         response = rs485.get_response()
         if DEBUG:
-            print(STYLE['OKBLUE'] + "Response:", response.bytes, STYLE['ENDC'])
+            print(Style.OKBLUE + "Response:", response.bytes, Style.ENDC)
         if response.action == self.action:
             return response
         elif response.action == ERROR:
             if DEBUG:
-                print(STYLE['FAIL'], "ERROR:", response.bytes[9], STYLE['ENDC'])
+                print(Style.FAIL, "ERROR:", response.bytes[9], Style.ENDC)
             return response
         else:
             raise ValueError("This packet goes somewhere else =(")
 
     @property
     def bytes(self):
-        return Packet.preamble + self.payload + self.checkbytes
+        return Packet.PREAMBLE + self.payload + self.checkbytes
 
     @bytes.setter
     def bytes(self, array):
         packet = array[0]
-        if packet[0:5] != Packet.preamble + [Packet.header] + [Packet.version]:
-            packet = Packet.preamble + [Packet.header] + [Packet.version] + packet
+        if packet[0:5] != Packet.PREAMBLE + [Packet.HEADER] + [Packet.VERSION]:
+            packet = Packet.PREAMBLE + [Packet.HEADER] + [Packet.VERSION] + packet
 
-        payload_start = FIELDS['HEADER']
-        data_length = packet[FIELDS['DATA_LENGTH']]
-        data_end = payload_start + data_length + FIELDS['DATA'] - FIELDS['HEADER']
+        payload_start = Fields.HEADER
+        data_length = packet[Fields.DATA_LENGTH]
+        data_end = payload_start + data_length + Fields.DATA - Fields.HEADER
         packet_length = len(packet)
 
         payload = packet[payload_start:data_end]
 
-        if packet_length > data_length + FIELDS['DATA']:
+        if packet_length > data_length + Fields.DATA:
             read_checksum = 256 * packet[-2] + packet[-1]
             if read_checksum != sum(payload):
                 raise ValueError("Provided checksum does not match calculated checksum")
                 return False
 
-        self.dst = packet[FIELDS['DST']]
-        self.src = packet[FIELDS['SRC']]
-        self.action = packet[FIELDS['ACTION']]
+        self.dst = packet[Fields.DST]
+        self.src = packet[Fields.SRC]
+        self.action = packet[Fields.ACTION]
 
-        if data_end > FIELDS['DATA']:
-            self.data = packet[FIELDS['DATA']:data_end]
+        if data_end > Fields.DATA:
+            self.data = packet[Fields.DATA:data_end]
         else:
             self.data = None
 
@@ -148,9 +148,9 @@ class Packet():
     @property
     def payload(self):
         if self.data_length:
-            return [Packet.header, Packet.version, self.dst, self.src, self.action, self.data_length] + self.data
+            return [Packet.HEADER, Packet.VERSION, self.dst, self.src, self.action, self.data_length] + self.data
         else:
-            return [Packet.header, Packet.version, self.dst, self.src, self.action, self.data_length]
+            return [Packet.HEADER, Packet.VERSION, self.dst, self.src, self.action, self.data_length]
 
 #     def inspect(self):
 #         print("   Destination:\t\t", pp(self.dst), lookup(ADDRESSES, self.dst))
@@ -166,21 +166,21 @@ class Packet():
 #         if self.action == ACTIONS['PUMP_STATUS'] and self.data_length > 0:
 #             data = self.data
 # #            print(data)
-#             run = pp(data[PUMP_STATUS_FIELDS['RUN']])
+#             run = pp(data[PUMP_STATUS_FIELDS['RUN])
 #             print("      Run:\t\t", run, "ON" if run == "0a" else "OFF" if run == "04" else "")
-#             print("      Mode:\t\t", pp(data[PUMP_STATUS_FIELDS['MODE']]))
-#             print("      Drive State:\t", pp(data[PUMP_STATUS_FIELDS['DRIVE_STATE']]))
-#             watts_h = data[PUMP_STATUS_FIELDS['WATTS_H']]
-#             watts_l = data[PUMP_STATUS_FIELDS['WATTS_L']]
-#             print("      Watts_H:\t\t", pp(data[PUMP_STATUS_FIELDS['WATTS_H']]))
-#             print("      Watts_L:\t\t", pp(data[PUMP_STATUS_FIELDS['WATTS_L']]))
+#             print("      Mode:\t\t", pp(data[PUMP_STATUS_FIELDS['MODE]))
+#             print("      Drive State:\t", pp(data[PUMP_STATUS_FIELDS['DRIVE_STATE]))
+#             watts_h = data[PUMP_STATUS_FIELDS['WATTS_H]
+#             watts_l = data[PUMP_STATUS_FIELDS['WATTS_L]
+#             print("      Watts_H:\t\t", pp(data[PUMP_STATUS_FIELDS['WATTS_H]))
+#             print("      Watts_L:\t\t", pp(data[PUMP_STATUS_FIELDS['WATTS_L]))
 #             print("         Watts:\t\t\t", watts_h*0x100+watts_l)
-#             rpm_h = data[PUMP_STATUS_FIELDS['RPM_H']]
-#             rpm_l = data[PUMP_STATUS_FIELDS['RPM_L']]
-#             print("      RPM_H:\t\t", pp(data[PUMP_STATUS_FIELDS['RPM_H']]))
-#             print("      RPM_L:\t\t", pp(data[PUMP_STATUS_FIELDS['RPM_L']]))
+#             rpm_h = data[PUMP_STATUS_FIELDS['RPM_H]
+#             rpm_l = data[PUMP_STATUS_FIELDS['RPM_L]
+#             print("      RPM_H:\t\t", pp(data[PUMP_STATUS_FIELDS['RPM_H]))
+#             print("      RPM_L:\t\t", pp(data[PUMP_STATUS_FIELDS['RPM_L]))
 #             print("         RPM:\t\t\t", rpm_h*0x100+rpm_l)
-#             print("      REMAINING_TIME_H:\t", data[PUMP_STATUS_FIELDS['REMAINING_TIME_H']])
-#             print("      REMAINING_TIME_M:\t", data[PUMP_STATUS_FIELDS['REMAINING_TIME_M']])
-#             print("      CLOCK_TIME_H:\t", data[PUMP_STATUS_FIELDS['CLOCK_TIME_H']])
-#             print("      CLOCK_TIME_M:\t", data[PUMP_STATUS_FIELDS['CLOCK_TIME_M']])
+#             print("      REMAINING_TIME_H:\t", data[PUMP_STATUS_FIELDS['REMAINING_TIME_H])
+#             print("      REMAINING_TIME_M:\t", data[PUMP_STATUS_FIELDS['REMAINING_TIME_M])
+#             print("      CLOCK_TIME_H:\t", data[PUMP_STATUS_FIELDS['CLOCK_TIME_H])
+#             print("      CLOCK_TIME_M:\t", data[PUMP_STATUS_FIELDS['CLOCK_TIME_M])
