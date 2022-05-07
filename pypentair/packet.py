@@ -12,10 +12,10 @@ STYLE = {
 }
 
 FIELDS = {
-    'PACKET_HEADER_0':  0,
-    'PACKET_HEADER_1':  1,
-    'PACKET_HEADER_2':  2,
-    'PAYLOAD_HEADER':   3,
+    'PREAMBLE_0':       0,
+    'PREAMBLE_1':       1,
+    'PREAMBLE_2':       2,
+    'HEADER':           3,
     'VERSION':          4,
     'DST':              5,
     'SRC':              6,
@@ -102,9 +102,9 @@ class Packet():
         if packet[0:5] != Packet.preamble + [Packet.header] + [Packet.version]:
             packet = Packet.preamble + [Packet.header] + [Packet.version] + packet
 
-        payload_start = FIELDS['PAYLOAD_HEADER']
+        payload_start = FIELDS['HEADER']
         data_length = packet[FIELDS['DATA_LENGTH']]
-        data_end = payload_start + data_length + FIELDS['DATA'] - FIELDS['PAYLOAD_HEADER']
+        data_end = payload_start + data_length + FIELDS['DATA'] - FIELDS['HEADER']
         packet_length = len(packet)
 
         payload = packet[payload_start:data_end]
