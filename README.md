@@ -9,6 +9,8 @@
 |When attempting to set Program 5 to Egg Timer (which is not allowed per the docs)|10|
 |When attempting to set Program 1 to Disabled (which is not allowed per the docs)|10|
 |When attempting to schedule a time that isn't a real time|10|
+|When messing up setting time|1|
+|When sending a get or set with no parameters|8|
 
 ## Devices
 
