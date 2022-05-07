@@ -1,12 +1,5 @@
 import serial
 
-RS485 = serial.Serial(port='/dev/ttyUSB0',
-                      baudrate=9600,
-                      parity=serial.PARITY_NONE,
-                      stopbits=serial.STOPBITS_ONE,
-                      bytesize=serial.EIGHTBITS,
-                      timeout=1)
-
 STYLE = {
     'HEADER':       '\033[95m',
     'OKBLUE':       '\033[94m',
@@ -36,20 +29,32 @@ ERROR = 0xFF
 DEBUG = True
 
 
-def getResponse():
-    pbytes = []
-    while True:
-        for c in RS485.read():
-            pbytes.append(c)
-            if len(pbytes) > 4:
-                pbytes.pop(0)
-            if pbytes == Packet.preamble + [Packet.header]:
-                pbytes.extend(list(RS485.read(4)))  # Version, DST, SRC, Action
-                data_length = ord(RS485.read())
-                pbytes.append(data_length)
-                pbytes.extend(list(RS485.read(data_length)))  # Data
-                pbytes.extend(list(RS485.read(2)))            # Checksum
-                return Packet(pbytes)
+class RS485(serial.Serial):
+    def __init__(self):
+        super().__init__(port='/dev/ttyUSB0',
+                         baudrate=9600,
+                         parity=serial.PARITY_NONE,
+                         stopbits=serial.STOPBITS_ONE,
+                         bytesize=serial.EIGHTBITS,
+                         timeout=1)
+
+    def get_response(self):
+        pbytes = []
+        while True:
+            for c in self.read():
+                pbytes.append(c)
+                if len(pbytes) > 4:
+                    pbytes.pop(0)
+                if pbytes == Packet.preamble + [Packet.header]:
+                    pbytes.extend(list(self.read(4)))  # Version, DST, SRC, Action
+                    data_length = ord(self.read())
+                    pbytes.append(data_length)
+                    pbytes.extend(list(self.read(data_length)))  # Data
+                    pbytes.extend(list(self.read(2)))            # Checksum
+                    return Packet(pbytes)
+
+
+rs485 = RS485()
 
 
 class Packet():
@@ -70,12 +75,12 @@ class Packet():
                 self.data = data
 
     def send(self):
-        RS485.write(bytearray(self.bytes))
+        rs485.write(bytearray(self.bytes))
         if DEBUG:
             print()
         if DEBUG:
             print(STYLE['OKGREEN'] + "Request: ", self.bytes, STYLE['ENDC'])
-        response = getResponse()
+        response = rs485.get_response()
         if DEBUG:
             print(STYLE['OKBLUE'] + "Response:", response.bytes, STYLE['ENDC'])
         if response.action == self.action:
