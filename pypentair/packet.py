@@ -142,7 +142,7 @@ class Packet():
             return 0
 
     @property
-    def idata(self):
+    def as_int(self):
         return(self.data[0] << 8 | self.data[1])
 
     @property
