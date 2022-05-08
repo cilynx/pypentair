@@ -88,18 +88,6 @@ PUMP_STATUS_FIELDS = {
     'CLOCK_TIME_M':         14
 }
 
-PUMP_PROGRAM = {
-    'PROGRAM_1':    0x02,
-    'PROGRAM_2':    0x03,
-    'PROGRAM_3':    0x04,
-    'PROGRAM_4':    0x05,
-    'PROGRAM_5':    0x06,
-    'PROGRAM_6':    0x07,
-    'PROGRAM_7':    0x08,
-    'PROGRAM_8':    0x09,
-    'QUICK_CLEAN':  0x0a,
-    'TIME_OUT':     0x0b,
-}
 
 # Programs 1-4 can be programmed in all three modes.
 # Programs 5-8 can only be programmed in Schedule

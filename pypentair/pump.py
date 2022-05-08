@@ -3,7 +3,6 @@ import datetime
 from .packet import Packet
 
 ACTIONS = {
-    'PUMP_PROGRAM':         0x05,
     'PUMP_POWER':           0x06,
     'PUMP_STATUS':          0x07,
     '__0x08__':             0x08,
@@ -101,8 +100,6 @@ class Pump():
     def __init__(self, id):
         # self._address = ADDRESSES["INTELLIFLO_PUMP_" + str(index)]
         self._address = 0x60 + id - 1
-        self._remote_control = None
-        self._program = None
 
     def send(self, action, data=None):
         return Packet(dst=self.address, action=action, data=data).send()
@@ -145,7 +142,32 @@ class Pump():
         # still returns 1.  Being that we're a remote controller by definition
         # the pump may be being smarter than us here.
 
+    @property
+    def selected_program(self):
+        response = self.send(0x05)
+        return response.data
+        # This function runs successfully on the pump even if you provide an
+        # invalid program id -- e.g. an integer greater than 8.  Generally
+        # speaking, the pump throws ERROR 10 for invalid parameter.  I'm not
+        # convinced 0x05 is actually the selected program.
 
+    @selected_program.setter
+    def selected_program(self, program):
+        self.send(0x05, [program])
+        # As above, this runs successfully on the pump and the return payload
+        # looks like the setting was updated, but requesting the value after
+        # updating it, it always returns 1.  Going to have to play more with
+        # this.
+
+
+    # @property
+    # def running_program(self):
+    #     return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).to_int/8))
+    #
+    # @running_program.setter
+    # def running_program(self, index):
+    #     self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + [index*8])
+    #
 
 
 
@@ -348,14 +370,6 @@ class Pump():
         minutes = 60 * time[0] + time[1]
         self.send(ACTIONS['SET'], SETTING['QUICK_TIMER'] + bytelist(minutes))
 
-    @property
-    def running_program(self):
-        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).to_int/8))
-
-    @running_program.setter
-    def running_program(self, index):
-        self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + [index*8])
-
     def program(self, index):
         return Program(self, index)
 
@@ -394,16 +408,6 @@ class Pump():
             if DEBUG: print("Desired RPM:", self.trpm, "Actual RPM:", self.rpm)
             time.sleep(1)
         raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
-
-    @property
-    def running_program(self):
-        return self._program
-
-    @running_program.setter
-    def running_program(self, id):
-        self.send(ACTIONS['PUMP_PROGRAM'], [PUMP_PROGRAM[id]])
-        self._program = id
-        return self._program
 
     @property
     def soft_prime_counter(self):
@@ -473,6 +477,17 @@ class Pump():
 
 
 class Program():
+
+    PROGRAM_1 = 0x02
+    PROGRAM_2 = 0x03
+    PROGRAM_3 = 0x04
+    PROGRAM_4 = 0x05
+    PROGRAM_5 = 0x06
+    PROGRAM_6 = 0x07
+    PROGRAM_7 = 0x08
+    PROGRAM_8 = 0x09
+    QUICK_CLEAN = 0x0a
+    TIME_OUT = 0x0b
 
     SCHEDULE_START = [0x03, 0x95]
     SCHEDULE_END = [0x03, 0x9D]
