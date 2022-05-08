@@ -3,7 +3,6 @@ import datetime
 from .packet import Packet
 
 ACTIONS = {
-    'REMOTE_CONTROL':       0x04,
     'PUMP_PROGRAM':         0x05,
     'PUMP_POWER':           0x06,
     'PUMP_STATUS':          0x07,
@@ -105,6 +104,9 @@ class Pump():
         self._remote_control = None
         self._program = None
 
+    def send(self, action, data=None):
+        return Packet(dst=self.address, action=action, data=data).send()
+
     def ping(self):
         response = self.send(0x00)
         if response.payload == [Packet.HEADER, Packet.VERSION, 0x21, self.address, 0, 0]:
@@ -122,18 +124,23 @@ class Pump():
         response = self.send(0x03)
         return datetime.time(response.data[0], response.data[1])
 
+    @property
+    def remote_control(self):
+        response = self.send(0x04)
+        return response.data[0] == 1
+
+    @remote_control.setter
+    def remote_control(self, state):
+        state = 0xFF if state else 0x00
+        self.send(0x04, state)
+        # This function runs successfully on the pump, but doesn't actually
+        # change the state.  Right after setting to 0, requesting the value
+        # still returns 1.  Being that we're a remote controller by definition
+        # the pump may be being smarter than us here.
 
 
 
 
-    def send(self, action, data=None):
-        # self.remote_control = True
-        response = Packet(dst=self.address, action=action, data=data).send()
-        # Should add some error checking and retry logic here -- confirm that
-        # the response packet is for the same action we sent or handle the
-        # error if not.
-        # self.remote_control = False
-        return response
 
     @property
     def address(self):
@@ -373,19 +380,6 @@ class Pump():
     @ramp.setter
     def ramp(self, rpm):
         self.send(ACTIONS['SET'], SETTING['RAMP'] + bytelist(rpm))
-
-    @property
-    def remote_control(self):
-        return self._remote_control
-
-    @remote_control.setter
-    def remote_control(self, state):
-        response = Packet(
-                dst     = self.address,
-                action  = ACTIONS['REMOTE_CONTROL'],
-                data    = [REMOTE_CONTROL_MODES[state]]
-                ).send()
-        self._remote_control = state
 
     @property
     def rpm(self):
