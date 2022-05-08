@@ -108,10 +108,10 @@ class Pump():
         self._program = None
 
     def get(self, address):
-        return self.send(ACTIONS['GET'], address).as_int
+        return self.send(ACTIONS['GET'], address).to_int
 
     def set(self, address, value):
-        return self.send(ACTIONS['SET'], address + bytelist(value)).as_int
+        return self.send(ACTIONS['SET'], address + bytelist(value)).to_int
 
     def send(self, action, data=None):
         # self.remote_control = True
@@ -132,11 +132,11 @@ class Pump():
             dst=self.address,
             action=ACTIONS['SET'],
             data=SETTING['ADDRESS'] + bytelist(int(address))
-        ).send().as_int
+        ).send().to_int
 
     @property
     def ampm(self):
-        return not self.send(ACTIONS['GET'], SETTING['24_HOUR']).as_int
+        return not self.send(ACTIONS['GET'], SETTING['24_HOUR']).to_int
 
     @ampm.setter
     def ampm(self, state):
@@ -144,7 +144,7 @@ class Pump():
 
     @property
     def antifreeze_enable(self):
-        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_ENABLE']).as_int
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_ENABLE']).to_int
 
     @antifreeze_enable.setter
     def antifreeze_enable(self, state):
@@ -152,7 +152,7 @@ class Pump():
 
     @property
     def antifreeze_rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_RPM']).to_int
 
     @antifreeze_rpm.setter
     def antifreeze_rpm(self, rpm):
@@ -160,7 +160,7 @@ class Pump():
 
     @property
     def antifreeze_temp(self):
-        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_TEMP']).as_int
+        return self.send(ACTIONS['GET'], SETTING['ANTIFREEZE_TEMP']).to_int
 
     @antifreeze_temp.setter
     def antifreeze_temp(self, temp):
@@ -168,7 +168,7 @@ class Pump():
 
     @property
     def celsius(self):
-        return self.send(ACTIONS['GET'], SETTING['CELSIUS']).as_int
+        return self.send(ACTIONS['GET'], SETTING['CELSIUS']).to_int
 
     @celsius.setter
     def celsius(self, state):
@@ -176,7 +176,7 @@ class Pump():
 
     @property
     def contrast(self):
-        return self.send(ACTIONS['GET'], SETTING['CONTRAST']).as_int
+        return self.send(ACTIONS['GET'], SETTING['CONTRAST']).to_int
 
     @contrast.setter
     def contrast(self, state):
@@ -230,7 +230,7 @@ class Pump():
 
     @property
     def max_rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['MAX_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['MAX_RPM']).to_int
 
     @max_rpm.setter
     def max_rpm(self, rpm):
@@ -238,7 +238,7 @@ class Pump():
 
     @property
     def min_rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['MIN_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['MIN_RPM']).to_int
 
     @min_rpm.setter
     def min_rpm(self, rpm):
@@ -250,7 +250,7 @@ class Pump():
 
     @property
     def password_enable(self):
-        return self.send(ACTIONS['GET'], SETTING['PASSWORD_ENABLE']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD_ENABLE']).to_int
 
     @password_enable.setter
     def password_enable(self, state):
@@ -258,7 +258,7 @@ class Pump():
 
     @property
     def password_timeout(self):
-        return self.send(ACTIONS['GET'], SETTING['PASSWORD_TIMEOUT']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD_TIMEOUT']).to_int
 
     @password_timeout.setter
     def password_timeout(self, timeout):
@@ -266,7 +266,7 @@ class Pump():
 
     @property
     def password(self):
-        return self.send(ACTIONS['GET'], SETTING['PASSWORD']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PASSWORD']).to_int
 
     @password.setter
     def password(self, password):
@@ -290,7 +290,7 @@ class Pump():
 
     @property
     def prime_enable(self):
-        return self.send(ACTIONS['GET'], SETTING['PRIME_ENABLE']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PRIME_ENABLE']).to_int
 
     @prime_enable.setter
     def prime_enable(self, state):
@@ -298,7 +298,7 @@ class Pump():
 
     @property
     def prime_delay(self):
-        return self.send(ACTIONS['GET'], SETTING['PRIME_DELAY']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PRIME_DELAY']).to_int
 
     @prime_delay.setter
     def prime_delay(self, minutes):
@@ -306,7 +306,7 @@ class Pump():
 
     @property
     def prime_max_time(self):
-        return self.send(ACTIONS['GET'], SETTING['PRIME_MAX_TIME']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PRIME_MAX_TIME']).to_int
 
     @prime_max_time.setter
     def prime_max_time(self, minutes):
@@ -314,7 +314,7 @@ class Pump():
 
     @property
     def prime_sensitivity(self):
-        return self.send(ACTIONS['GET'], SETTING['PRIME_SENSITIVITY']).as_int
+        return self.send(ACTIONS['GET'], SETTING['PRIME_SENSITIVITY']).to_int
 
     @prime_sensitivity.setter
     def prime_sensitivity(self, sensitivity):
@@ -322,7 +322,7 @@ class Pump():
 
     @property
     def quick_rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['QUICK_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['QUICK_RPM']).to_int
 
     @quick_rpm.setter
     def quick_rpm(self, rpm):
@@ -330,7 +330,7 @@ class Pump():
 
     @property
     def quick_timer(self):
-        minutes = self.send(ACTIONS['GET'], SETTING['QUICK_TIMER']).as_int
+        minutes = self.send(ACTIONS['GET'], SETTING['QUICK_TIMER']).to_int
         return [int(minutes/60), minutes % 60]
 
     @quick_timer.setter
@@ -340,7 +340,7 @@ class Pump():
 
     @property
     def running_program(self):
-        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).as_int/8))
+        return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).to_int/8))
 
     @running_program.setter
     def running_program(self, index):
@@ -355,7 +355,7 @@ class Pump():
 
     @property
     def ramp(self):
-        return self.send(ACTIONS['GET'], SETTING['RAMP']).as_int
+        return self.send(ACTIONS['GET'], SETTING['RAMP']).to_int
 
     @ramp.setter
     def ramp(self, rpm):
@@ -376,11 +376,11 @@ class Pump():
 
     @property
     def rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['ACTUAL_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['ACTUAL_RPM']).to_int
 
     @property
     def trpm(self):
-        return self.send(ACTIONS['GET'], SETTING['TARGET_RPM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['TARGET_RPM']).to_int
 
     @trpm.setter
     def trpm(self, rpm):
@@ -410,7 +410,7 @@ class Pump():
 
     @property
     def soft_prime_counter(self):
-        return self.send(ACTIONS['GET'], SETTING['SOFT_PRIME_COUNTER']).as_int
+        return self.send(ACTIONS['GET'], SETTING['SOFT_PRIME_COUNTER']).to_int
 
     @soft_prime_counter.setter
     def soft_prime_counter(self, minutes):
@@ -438,11 +438,11 @@ class Pump():
 
     @property
     def svrs_alarm(self):
-        return self.send(ACTIONS['GET'], SETTING['SVRS_ALARM']).as_int
+        return self.send(ACTIONS['GET'], SETTING['SVRS_ALARM']).to_int
 
     @property
     def svrs_restart_enable(self):
-        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_ENABLE']).as_int
+        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_ENABLE']).to_int
 
     @svrs_restart_enable.setter
     def svrs_restart_enable(self, state):
@@ -450,7 +450,7 @@ class Pump():
 
     @property
     def svrs_restart_timer(self):
-        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_TIMER']).as_int
+        return self.send(ACTIONS['GET'], SETTING['SVRS_RESTART_TIMER']).to_int
 
     @svrs_restart_timer.setter
     def svrs_restart_timer(self, seconds):
@@ -468,7 +468,7 @@ class Pump():
 
     @property
     def time_out_timer(self):
-        minutes = self.send(ACTIONS['GET'], SETTING['TIME_OUT_TIMER']).as_int
+        minutes = self.send(ACTIONS['GET'], SETTING['TIME_OUT_TIMER']).to_int
         return [int(minutes/60), minutes % 60]
 
     @time_out_timer.setter
