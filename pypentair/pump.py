@@ -1,10 +1,8 @@
+import datetime
+
 from .packet import Packet
 
 ACTIONS = {
-    'PING':                 0x00,
-    'SET':                  0x01,
-    'GET':                  0x02,
-    'GET_TIME':             0x03,
     'REMOTE_CONTROL':       0x04,
     'PUMP_PROGRAM':         0x05,
     'PUMP_POWER':           0x06,
@@ -107,11 +105,26 @@ class Pump():
         self._remote_control = None
         self._program = None
 
-    def get(self, address):
-        return self.send(ACTIONS['GET'], address).to_int
+    def ping(self):
+        response = self.send(0x00)
+        if response.payload == [Packet.HEADER, Packet.VERSION, 0x21, self.address, 0, 0]:
+            return True
+        return False
 
     def set(self, address, value):
-        return self.send(ACTIONS['SET'], address + bytelist(value)).to_int
+        return self.send(0x01, address + bytelist(value)).to_int
+
+    def get(self, address):
+        return self.send(0x02, address).to_int
+
+    @property
+    def time(self):
+        response = self.send(0x03)
+        return datetime.time(response.data[0], response.data[1])
+
+
+
+
 
     def send(self, action, data=None):
         # self.remote_control = True
@@ -455,12 +468,6 @@ class Pump():
     @svrs_restart_timer.setter
     def svrs_restart_timer(self, seconds):
         self.send(ACTIONS['SET'], SETTING['SVRS_RESTART_TIMER'] + bytelist(seconds))
-
-    @property
-    def time(self):
-        return list(self.send(ACTIONS['GET_TIME']).data)
-        # Could also get from self.status, but that puts more bytes on the bus
-        # return self.status['time']
 
     @property
     def timer(self):
