@@ -124,6 +124,13 @@ class Pump():
         response = self.send(0x03)
         return datetime.time(response.data[0], response.data[1])
 
+    @time.setter
+    def time(self, time):
+        self.send(0x03, [time.hour, time.minute])
+
+    def sync_time(self):
+        self.time = datetime.datetime.now()
+
     @property
     def remote_control(self):
         response = self.send(0x04)
@@ -214,23 +221,6 @@ class Pump():
     @dt.setter
     def dt(self, data):
         return self.send(ACTIONS['SET_DATETIME'], [data['hour'], data['minute'], WEEKDAYS[data['dow']], data['dom'], data['month'], data['year'], data['dst'], data['auto_dst']])
-
-    def sync_clock(self):
-        now = datetime.now()
-        dow = now.weekday()
-        if dow == 6:
-            dow = 0
-        else:
-            dow = 2**dow
-        print(now.hour)
-        print(now.minute)
-        print(dow)
-        print(now.day)
-        print(now.month + 1)
-        print(now.strftime('%y'))
-        print(int(bool(now.dst())))
-        return self.send(action=133, data=[13,10,16,29,8,19,0,0])
-        # return self.send(ACTIONS['SET_DATETIME'], [now.hour, now.minute, dow, now.day, now.month, int(now.strftime('%y')), int(bool(now.dst())), 1])
 
     @property
     def fahrenheit(self):
