@@ -70,23 +70,7 @@ BROADCAST_ACTIONS = {
 
 
 
-PUMP_STATUS_FIELDS = {
-    'RUN':                  0,
-    'MODE':                 1,
-    'DRIVE_STATE':          2,
-    'WATTS_H':              3,
-    'WATTS_L':              4,
-    'RPM_H':                5,
-    'RPM_L':                6,
-    'GPM':                  7,
-    'PPC':                  8,
-    'UNKNOWN':              9,
-    'ERROR':                10,
-    'REMAINING_TIME_H':     11,
-    'REMAINING_TIME_M':     12,
-    'CLOCK_TIME_H':         13,
-    'CLOCK_TIME_M':         14
-}
+
 
 
 # Programs 1-4 can be programmed in all three modes.

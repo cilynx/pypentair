@@ -1,10 +1,10 @@
 import datetime
 
+from time import sleep
+
 from .packet import Packet
 
 ACTIONS = {
-    'PUMP_POWER':           0x06,
-    'PUMP_STATUS':          0x07,
     '__0x08__':             0x08,
     '__0x09__':             0x09,
     '__0x0A__':             0x0A,
@@ -123,7 +123,7 @@ class Pump():
 
     @time.setter
     def time(self, time):
-        self.send(0x03, [time.hour, time.minute])
+        self.send(0x03, [time.hour, time.minute, time.second])
 
     def sync_time(self):
         self.time = datetime.datetime.now()
@@ -149,7 +149,8 @@ class Pump():
         # This function runs successfully on the pump even if you provide an
         # invalid program id -- e.g. an integer greater than 8.  Generally
         # speaking, the pump throws ERROR 10 for invalid parameter.  I'm not
-        # convinced 0x05 is actually the selected program.
+        # convinced 0x05 is actually the selected program.  Sometimes running
+        # this command starts the pump, but it's always on Program 1.
 
     @selected_program.setter
     def selected_program(self, program):
@@ -158,6 +159,41 @@ class Pump():
         # looks like the setting was updated, but requesting the value after
         # updating it, it always returns 1.  Going to have to play more with
         # this.
+
+    @property
+    def run(self):
+        return self.status['run']
+        # response = self.send(0x06)
+        # return response.data
+        # Calling 0x06 without any parameters always returns 1, but status[0]
+        # updates as it should with the appropriate run state.
+
+    @run.setter
+    def run(self, state):
+        state = 0x0A if state else 0x04
+        print("Attempting to set run:", state)
+        for x in range(0, 120):
+            self.send(0x06, state)
+            print("Desired run state:", state, "Actual run state:", self.run)
+            if self.run == state:
+                print("Successfully set run:", state)
+                return
+            sleep(1)
+        raise ValueError("Did not achieve desired run state within 2-minutes.")
+
+    @property
+    def status(self):
+        response = self.send(0x07)
+        data = response.data
+        return {
+            'run':      data[0],
+            'mode':     data[1],
+            'drive':    data[2],
+            'watts':    256*data[3]+data[4],
+            'rpm':      256*data[5]+data[6],
+            'timer':    [data[11], data[12]],
+            'time':     [data[13], data[14]]
+        }
 
 
     # @property
@@ -305,22 +341,6 @@ class Pump():
         self.send(ACTIONS['SET'], SETTING['PASSWORD'] + bytelist(password))
 
     @property
-    def power(self):
-        return self.status['run'] == 0x0A
-
-    @power.setter
-    def power(self, state):
-        if DEBUG: print("Attempting to set power:", state)
-        for x in range(0,120):
-            response = self.send(ACTIONS['PUMP_POWER'], [PUMP_POWER[state]])
-            if DEBUG: print("Desired power state:", state, "Actual power state:", self.power)
-            if self.power == state:
-                if DEBUG: print("Successfully set power:", state)
-                return
-            time.sleep(1)
-        raise ValueError("Did not achieve desired PUMP_POWER state within 2-minutes.")
-
-    @property
     def prime_enable(self):
         return self.send(ACTIONS['GET'], SETTING['PRIME_ENABLE']).to_int
 
@@ -416,26 +436,6 @@ class Pump():
     @soft_prime_counter.setter
     def soft_prime_counter(self, minutes):
         self.send(ACTIONS['SET'], SETTING['SOFT_PRIME_COUNTER'] + bytelist(minutes))
-
-    @property
-    def status(self):
-        response = self.send(ACTIONS['PUMP_STATUS'])
-        # We should be able to get rid of this sanity check once we implement
-        # sanity checking in self.send()
-        if response.action == ACTIONS['PUMP_STATUS']:
-            if INSPECT_STATUS:
-                response.inspect()
-            data = response.data
-            return {
-                'run':      data[PUMP_STATUS_FIELDS['RUN']],
-                'mode':     data[PUMP_STATUS_FIELDS['MODE']],
-                'watts':    data[PUMP_STATUS_FIELDS['WATTS_L']] + 256 * data[PUMP_STATUS_FIELDS['WATTS_H']],
-                'rpm':      data[PUMP_STATUS_FIELDS['RPM_L']] + 256 * data[PUMP_STATUS_FIELDS['RPM_H']],
-                'timer':    [data[PUMP_STATUS_FIELDS['REMAINING_TIME_H']], data[PUMP_STATUS_FIELDS['REMAINING_TIME_M']]],
-                'time':     [data[PUMP_STATUS_FIELDS['CLOCK_TIME_H']], data[PUMP_STATUS_FIELDS['CLOCK_TIME_M']]]
-                }
-        else:
-            return False
 
     @property
     def svrs_alarm(self):

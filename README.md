@@ -4,13 +4,15 @@
 
 |Error|Number|
 |-|-|
-|When attempting to set a program RPM lower than MIN_RPM|10|
-|When attempting to set Program 5 to Manual (which is not allowed per the docs)|10|
-|When attempting to set Program 5 to Egg Timer (which is not allowed per the docs)|10|
-|When attempting to set Program 1 to Disabled (which is not allowed per the docs)|10|
-|When attempting to schedule a time that isn't a real time|10|
-|When messing up setting time|1|
-|When sending a get or set with no parameters|8|
+|Messing up setting time|1|
+|Sending H, M, and S to the time setter that only understand H, M|7|
+|Sending a get or set with no parameters|8|
+|Setting a program RPM lower than MIN_RPM|10|
+|Setting Program 5 to Manual (which is not allowed per the docs)|10|
+|Setting Program 5 to Egg Timer (which is not allowed per the docs)|10|
+|Setting Program 1 to Disabled (which is not allowed per the docs)|10|
+|Scheduling a time that isn't a real time|10|
+|Schedule start time after playing with running schedules|25|
 
 ## Devices
 
@@ -39,7 +41,28 @@
 |INTELLIFLO_PUMP_15|0x6E|
 |INTELLIFLO_PUMP_16|0x6F|
 
+## Status Fields
+
+|Device|Field|Address|
+|-|-|-|
+|Pump|RUN|0|
+|Pump|MODE|1|
+|Pump|DRIVE_STATE|2|
+|Pump|WATTS_H|3|
+|Pump|WATTS_L|4|
+|Pump|RPM_H|5|
+|Pump|RPM_L|6|
+|Pump|GPM|7|
+|Pump|PPC|8|
+|Pump|UNKNOWN|9|
+|Pump|ERROR|10|
+|Pump|REMAINING_TIME_H|11|
+|Pump|REMAINING_TIME_M|12|
+|Pump|CLOCK_TIME_H|13|
+|Pump|CLOCK_TIME_M|14|
+
 ## Actions
+
 |Device|Action|Address|Notes|
 |-|-|-|-|
 |Pump|PING|0x00|
