@@ -39,6 +39,24 @@
 |INTELLIFLO_PUMP_15|0x6E|
 |INTELLIFLO_PUMP_16|0x6F|
 
+## Actions
+|Device|Action|Address|Notes|
+|-|-|-|-|
+|Pump|PING|0x00|
+|Pump|SET|0x01|
+|Pump|GET|0x02|
+|Pump|GET_TIME|0x03|
+|Pump|REMOTE_CONTROL|0x04|
+|Pump|PUMP_PROGRAM|0x05|
+|Pump|PUMP_POWER|0x06|
+|Pump|PUMP_STATUS|0x07|
+|Pump|SET_DATETIME|0x85|Need to figure out how these align with BROADCAST_ACTIONS, GET, and SET|
+|Pump|GET_DATETIME|0xC5|
+|Pump|GET_PUMP_STATUS|0xC7|
+|Pump|GET_SCHEDULE_DETAILS|0xD1|
+|Pump|GET_PUMP_CONFIG|0xD8|
+|Pump|ERROR|0xFF|
+
 ## Settings
 
 |Device|Scope|Setting|Address|
