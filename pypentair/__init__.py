@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+import binascii
+
 from .pump import Pump
 
-
-DEBUG               = True
-INSPECT_STATUS      = False
 RAISE_PACKET_ERRORS = False
+INSPECT_STATUS = False
 
 ADDRESSES = {
     'BROADCAST':                    0x0F,
@@ -46,7 +46,7 @@ BROADCAST_ACTIONS = {
     'SCHEDULE_DETAILS':             0x11,
     'INTELLICHEM':                  0x12,
     'INTELLIFLO_SPA_SIDE_CONTROL':  0x16,
-    'PUMP_STATUS_2':                0x17, # Differentation with 0x07?
+    'PUMP_STATUS_2':                0x17,  # Differentation with 0x07?
     'PUMP_CONFIG':                  0x18,
     'INTELLICHLOR_STATUS':          0x19,
     'PUMP_CONFIG_EXTENDED':         0x1B,
@@ -54,7 +54,7 @@ BROADCAST_ACTIONS = {
     'HIGH_SPEED_VALVE_CIRCUITS':    0x1E,
     'IS4_IS10':                     0x20,
     'INTELLIFLO_SPA_SIDE_REMOTE':   0x21,
-    'HEATER_PUMP_STATUS':           0x22,
+    'HEATER_PUMP_STATUS_2':         0x22,  # Differentiation with 0x10?
     'DELAY_STATUS':                 0x23,
     'LIGHT_GROUPS':                 0x27,
     'HEAT_SETTINGS':                0x28,
@@ -64,14 +64,9 @@ BROADCAST_ACTIONS = {
 
 # For STATUS (0x02) through HEAT_SETTINGS (0x28):
 # - Add 0x80 for Setter
-#SET = 0x80
+# SET = 0x80
 # - Add 0xC0 for Getter
-#GET = 0xC0
-
-
-
-
-
+# GET = 0xC0
 
 # Programs 1-4 can be programmed in all three modes.
 # Programs 5-8 can only be programmed in Schedule
@@ -105,31 +100,16 @@ REMOTE_CONTROL_MODES = {
     True:   0xff
 }
 
-WEEKDAYS = {
-    'SUNDAY':       1,
-    'MONDAY':       2,
-    'TUESDAY':      4,
-    'WEDNESDAY':    8,
-    'THURSDAY':     16,
-    'FRIDAY':       32,
-    'SATURDAY':     64,
-}
-
-# SCHEDULE_DAYS are WEEKDAYS + 128 as the most significant bit of the mask is always high
+# SCHEDULE_DAYS are WEEKDAYS + 128 as the most significant bit of the mask
+# is always high
 
 
-
-
-def lookup(dict, val): # Dictionary inversion
+def lookup(dict, val):  # Dictionary inversion
     try:
         return list(dict.keys())[list(dict.values()).index(val)]
     except:
         return val
 
+
 def pp(prop):
     return binascii.hexlify(bytearray([prop]))
-
-
-
-import binascii
-import time

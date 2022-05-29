@@ -1,6 +1,6 @@
 import serial
 
-DEBUG = True
+DEBUG = False
 
 ERROR = 0xFF
 

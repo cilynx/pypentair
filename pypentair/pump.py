@@ -91,6 +91,16 @@ SETTING = {
     'SOFT_PRIME_COUNTER':   [0x03, 0xC4],   # Error 11 when trying to set.
 }
 
+WEEKDAYS = {
+    'SUNDAY':       1,
+    'MONDAY':       2,
+    'TUESDAY':      4,
+    'WEDNESDAY':    8,
+    'THURSDAY':     16,
+    'FRIDAY':       32,
+    'SATURDAY':     64,
+}
+
 
 def bytelist(x):
     return list(x.to_bytes(2, byteorder='big'))
@@ -106,7 +116,12 @@ class Pump():
 
     def ping(self):
         response = self.send(0x00)
-        if response.payload == [Packet.HEADER, Packet.VERSION, 0x21, self.address, 0, 0]:
+        if response.payload == [Packet.HEADER,
+                                Packet.VERSION,
+                                0x21,
+                                self.address,
+                                0,
+                                0]:
             return True
         return False
 
@@ -195,7 +210,6 @@ class Pump():
             'time':     [data[13], data[14]]
         }
 
-
     # @property
     # def running_program(self):
     #     return(int(self.send(ACTIONS['GET'], SETTING['RUNNING_PROGRAM']).to_int/8))
@@ -204,8 +218,6 @@ class Pump():
     # def running_program(self, index):
     #     self.send(ACTIONS['SET'], SETTING['RUNNING_PROGRAM'] + [index*8])
     #
-
-
 
     @property
     def address(self):
@@ -278,7 +290,17 @@ class Pump():
 
     @dt.setter
     def dt(self, data):
-        return self.send(ACTIONS['SET_DATETIME'], [data['hour'], data['minute'], WEEKDAYS[data['dow']], data['dom'], data['month'], data['year'], data['dst'], data['auto_dst']])
+        return self.send(ACTIONS['SET_DATETIME'],
+                         [
+                            data['hour'],
+                            data['minute'],
+                            WEEKDAYS[data['dow']],
+                            data['dom'],
+                            data['month'],
+                            data['year'],
+                            data['dst'],
+                            data['auto_dst']
+                         ])
 
     @property
     def fahrenheit(self):
@@ -407,27 +429,28 @@ class Pump():
 
     @property
     def rpm(self):
-        return self.send(ACTIONS['GET'], SETTING['ACTUAL_RPM']).to_int
-
-    @property
-    def trpm(self):
-        return self.send(ACTIONS['GET'], SETTING['TARGET_RPM']).to_int
-
-    @trpm.setter
-    def trpm(self, rpm):
-        self.send(ACTIONS['SET'], SETTING['TARGET_RPM'] + bytelist(rpm))
+        return self.get(SETTING['ACTUAL_RPM'])
 
     @rpm.setter
     def rpm(self, rpm):
-        if DEBUG: print("Requesting RPM change to", rpm)
-        for x in range(0,120):
-            response = self.send(ACTIONS['SET'], SETTING['TARGET_RPM'] + bytelist(rpm))
-            if self.rpm == self.trpm:
-                if DEBUG: print("Successfully set RPM to ", rpm)
-                return
-            if DEBUG: print("Desired RPM:", self.trpm, "Actual RPM:", self.rpm)
-            time.sleep(1)
-        raise ValueError("Failed to achieve {} RPM within 2-minutes.".format(rpm))
+        print(f'Setting RPM: {rpm}')
+        count = 0
+        self.set(SETTING['TARGET_RPM'], rpm)
+        while self.rpm != self.trpm:
+            print(f'Target RPM: {self.trpm}, Actual RPM: {self.rpm}')
+            sleep(1)
+            count += 1
+            if count > 120:
+                self.set(SETTING['TARGET_RPM'], rpm)
+                count = 0
+
+    @property
+    def trpm(self):
+        return self.get(SETTING['TARGET_RPM'])
+
+    @trpm.setter
+    def trpm(self, rpm):
+        self.set(SETTING['TARGET_RPM'], rpm)
 
     @property
     def soft_prime_counter(self):
