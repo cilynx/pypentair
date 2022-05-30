@@ -2,7 +2,7 @@ import datetime
 
 from time import sleep
 
-from .packet import Packet
+from .packet import Packet, Style
 
 ACTIONS = {
     '__0x08__':             0x08,
@@ -443,6 +443,7 @@ class Pump():
             if count > 120:
                 self.set(SETTING['TARGET_RPM'], rpm)
                 count = 0
+        print(f'{Style.OKGREEN}Target RPM: {self.trpm}, Actual RPM: {self.rpm}{Style.ENDC}')
 
     @property
     def trpm(self):
