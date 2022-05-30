@@ -452,6 +452,9 @@ class Pump():
     def trpm(self, rpm):
         self.set(SETTING['TARGET_RPM'], rpm)
 
+    def maintain_speed(self):
+        self.trpm = self.rpm
+
     @property
     def soft_prime_counter(self):
         return self.send(ACTIONS['GET'], SETTING['SOFT_PRIME_COUNTER']).to_int
